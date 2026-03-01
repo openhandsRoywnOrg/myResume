@@ -48,8 +48,10 @@ jobs:
       LLM_MODEL: ${{ vars.LLM_MODEL || 'openai/qwen3.5-plus' }}
       target_branch: ${{ vars.TARGET_BRANCH || 'main' }}
       runner: ${{ vars.TARGET_RUNNER }}
+      LLM_TEMPERATURE: "0" 
     secrets:
       PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
       PAT_USERNAME: ${{ secrets.PAT_USERNAME }}
       LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
       LLM_BASE_URL: ${{ secrets.LLM_BASE_URL }}
+      LLM_TEMPERATURE: "0" 
