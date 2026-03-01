@@ -1,0 +1,80 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>搜索 - AI 运维开发面试知识总结</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 AI 运维开发面试知识总结</h1>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="搜索知识点...">
+                <button onclick="search()">搜索</button>
+            </div>
+        </header>
+
+        <main>
+            <h2>🔍 搜索结果</h2>
+            <div id="searchResults" class="search-results">
+                <!-- Results will be loaded here -->
+            </div>
+
+            <div class="back-link">
+                <a href="/">← 返回首页</a>
+            </div>
+        </main>
+
+        <footer>
+            <p>AI 运维开发面试知识总结 | 参照 <a href="https://www.mianshiya.com/" target="_blank">面试导航</a> 风格</p>
+        </footer>
+    </div>
+
+    <script>
+        async function search() {
+            const query = document.getElementById('searchInput').value;
+            if (!query) return;
+
+            try {
+                const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+                const results = await response.json();
+                renderResults(results, query);
+            } catch (error) {
+                console.error('Error searching:', error);
+            }
+        }
+
+        function renderResults(results, query) {
+            const container = document.getElementById('searchResults');
+            if (results.length === 0) {
+                container.innerHTML = '<p class="no-results">未找到相关结果</p>';
+                return;
+            }
+
+            container.innerHTML = results.map(result => `
+                <div class="search-result">
+                    <h3><a href="/topic/${result.category_id}/${result.id}">${result.topic}</a></h3>
+                    <p class="category">分类：${result.category}</p>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                search();
+            }
+        });
+
+        // Auto search if query parameter exists
+        const urlParams = new URLSearchParams(window.location.search);
+        const query = urlParams.get('q');
+        if (query) {
+            document.getElementById('searchInput').value = query;
+            search();
+        }
+    </script>
+</body>
+</html>
