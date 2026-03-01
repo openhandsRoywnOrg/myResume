@@ -1,0 +1,36 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ topic }} - AI 运维开发面试知识总结</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 AI 运维开发面试知识总结</h1>
+            <nav class="breadcrumb">
+                <a href="/">首页</a> &gt;
+                <a href="/#{{ category }}">{{ category }}</a> &gt;
+                <span>{{ topic }}</span>
+            </nav>
+        </header>
+
+        <main class="topic-content">
+            <article>
+                {{ content|safe }}
+            </article>
+
+            <div class="back-link">
+                <a href="/">← 返回首页</a>
+            </div>
+        </main>
+
+        <footer>
+            <p>AI 运维开发面试知识总结 | 参照 <a href="https://www.mianshiya.com/" target="_blank">面试导航</a> 风格</p>
+        </footer>
+    </div>
+</body>
+</html>
