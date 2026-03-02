@@ -230,6 +230,24 @@ header h1 {
     transform: translateX(5px);
 }
 
+.mindmap-btn {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 12px 30px;
+    background: white;
+    color: #667eea;
+    text-decoration: none;
+    border-radius: 25px;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.mindmap-btn:hover {
+    background: #f0f0f0;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
 main {
     background: white;
     padding: 40px;
