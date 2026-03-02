@@ -5,8 +5,12 @@ WARNING: This is a development server. Do not use it in a production deployment.
  * Running on http://127.0.0.1:51880
  * Running on http://172.17.0.2:51880
 Press CTRL+C to quit
-127.0.0.1 - - [01/Mar/2026 11:45:05] "GET /api/categories HTTP/1.1" 200 -
-127.0.0.1 - - [01/Mar/2026 11:45:11] "GET / HTTP/1.1" 200 -
-127.0.0.1 - - [01/Mar/2026 11:45:16] "GET /topic/ai-ml-basics/ml-fundamentals HTTP/1.1" 200 -
-127.0.0.1 - - [01/Mar/2026 11:45:19] "GET /api/search?q=æ\x9cºå\x99¨å­¦ä¹ HTTP/1.1" 200 -
-127.0.0.1 - - [01/Mar/2026 11:45:23] "GET /api/search?q=ml HTTP/1.1" 200 -
+127.0.0.1 - - [02/Mar/2026 04:58:09] "GET /mindmap HTTP/1.1" 200 -
+127.0.0.1 - - [02/Mar/2026 04:58:09] "GET /static/css/mindmap.css HTTP/1.1" 200 -
+127.0.0.1 - - [02/Mar/2026 04:58:09] "GET /static/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [02/Mar/2026 04:59:50] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [02/Mar/2026 04:59:50] "GET /static/css/style.css HTTP/1.1" 304 -
+127.0.0.1 - - [02/Mar/2026 04:59:50] "GET /api/categories HTTP/1.1" 200 -
+127.0.0.1 - - [02/Mar/2026 05:12:42] "GET /mindmap HTTP/1.1" 200 -
+127.0.0.1 - - [02/Mar/2026 05:12:42] "GET /static/css/mindmap.css HTTP/1.1" 304 -
+127.0.0.1 - - [02/Mar/2026 05:12:42] "GET /static/css/style.css HTTP/1.1" 304 -

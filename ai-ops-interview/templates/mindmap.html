@@ -1,0 +1,254 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>技术学习路线思维导图</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/mindmap.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧠 技术学习路线思维导图</h1>
+            <p class="subtitle">从基础运维开发到 AI 的完整学习路径</p>
+            <div class="controls">
+                <button onclick="zoomIn()" class="control-btn">🔍 放大</button>
+                <button onclick="zoomOut()" class="control-btn">🔍 缩小</button>
+                <button onclick="resetView()" class="control-btn">🔄 重置</button>
+                <button onclick="exportImage()" class="control-btn">📷 导出图片</button>
+                <button onclick="exportPDF()" class="control-btn">📄 导出 PDF</button>
+            </div>
+        </header>
+
+        <main>
+            <div id="mindmap-container">
+                <svg id="mindmap" width="100%" height="800"></svg>
+            </div>
+        </main>
+
+        <section class="progress-section">
+            <h2>📊 学习进度追踪</h2>
+            <div id="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="overall-progress"></div>
+                </div>
+                <p id="progress-text">总进度：0%</p>
+            </div>
+            <div id="stage-progress"></div>
+        </section>
+
+        <section class="legend-section">
+            <h2>📖 图例说明</h2>
+            <div class="legend">
+                <div class="legend-item">
+                    <span class="legend-color stage-1"></span>
+                    <span>基础运维开发阶段</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color stage-2"></span>
+                    <span>开发技能阶段</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color stage-3"></span>
+                    <span>云原生与 DevOps</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color stage-4"></span>
+                    <span>AI/ML 进阶阶段</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-status completed"></span>
+                    <span>已完成</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-status in-progress"></span>
+                    <span>学习中</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-status not-started"></span>
+                    <span>未开始</span>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p>技术学习路线思维导图 | 帮助学习者清晰了解技术成长路径</p>
+        </footer>
+    </div>
+
+    <!-- Modal for node details -->
+    <div id="node-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="modal-title"></h2>
+            <div id="modal-body"></div>
+            <div class="modal-actions">
+                <button onclick="markAsComplete()" class="action-btn complete">✅ 标记为完成</button>
+                <button onclick="markAsInProgress()" class="action-btn in-progress">📚 标记为学习中</button>
+                <button onclick="markAsNotStarted()" class="action-btn not-started">⏸️ 标记为未开始</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        // Mind map data structure
+        const mindMapData = {
+            id: 'root',
+            name: '技术学习路线',
+            stage: 0,
+            children: [
+                {
+                    id: 'stage1',
+                    name: '基础运维开发阶段',
+                    stage: 1,
+                    children: [
+                        { id: 'linux', name: 'Linux/Unix 系统基础', stage
+            statusCircle.setAttribute('cy', -height/2 + 10);
+            statusCircle.setAttribute('r', 6);
+            statusCircle.setAttribute('fill', statusColor);
+
+            g.appendChild(rect);
+            g.appendChild(statusCircle);
+            g.appendChild(text);
+            group.appendChild(g);
+        }
+
+        // Draw connection line
+        function drawConnection(x1, y1, x2, y2, group) {
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', x1);
+            line.setAttribute('y1', y1);
+            line.setAttribute('x2', x2);
+            line.setAttribute('y2', y2);
+            line.setAttribute('stroke', '#ccc');
+            line.setAttribute('stroke-width', '2');
+            line.setAttribute('stroke-dasharray', '5,5');
+            group.appendChild(line);
+        }
+
+        // Show node details modal
+        function showNodeDetails(data) {
+            currentNode = data;
+            document.getElementById('modal-title').textContent = data.name;
+
+            let content = `<p><strong>描述：</strong>${data.description || '暂无描述'}</p>`;
+
+            if (data.resources && data.resources.length > 0) {
+                content += '<p><strong>推荐资源：</strong></p><ul>';
+                data.resources.forEach(resource => {
+                    content += `<li>${resource}</li>`;
+                });
+                content += '</ul>';
+            }
+
+            const status = getNodeStatus(data.id);
+            content += `<p><strong>当前状态：</strong><span class="status-${status}">${getStatusText(status)}</span></p>`;
+
+            document.getElementById('modal-body').innerHTML = content;
+            document.getElementById('node-modal').style.display = 'block';
+        }
+
+        // Get status text
+        function getStatusText(status) {
+            const texts = {
+                'completed': '已完成',
+                'in-progress': '学习中',
+                'not-started': '未开始'
+            };
+            return texts[status] || status;
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('node-modal').style.display = 'none';
+        }
+
+        // Mark node as complete
+        function markAsComplete() {
+            if (currentNode) {
+                setNodeStatus(currentNode.id, 'completed');
+                closeModal();
+            }
+        }
+
+        // Mark node as in progress
+        function markAsInProgress() {
+            if (currentNode) {
+                setNodeStatus(currentNode.id, 'in-progress');
+                closeModal();
+            }
+        }
+
+        // Mark node as not started
+        function markAsNotStarted() {
+            if (currentNode) {
+                setNodeStatus(currentNode.id, 'not-started');
+                closeModal();
+            }
+        }
+
+        // Zoom functions
+        function zoomIn() {
+            currentZoom = Math.min(currentZoom + 0.2, 2);
+            svg.style.transform = `scale(${currentZoom})`;
+            svg.style.transformOrigin = 'center top';
+        }
+
+        function zoomOut() {
+            currentZoom = Math.max(currentZoom - 0.2, 0.6);
+            svg.style.transform = `scale(${currentZoom})`;
+            svg.style.transformOrigin = 'center top';
+        }
+
+        function resetView() {
+            currentZoom = 1;
+            svg.style.transform = 'scale(1)';
+        }
+
+        // Export functions
+        function exportImage() {
+            const container = document.getElementById('mindmap-container');
+            html2canvas(container).then(canvas => {
+                const link = document.createElement('a');
+                link.download = '技术学习路线思维导图.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+
+        function exportPDF() {
+            const container = document.getElementById('mindmap-container');
+            html2canvas(container).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('landscape', 'px', 'a4');
+                const imgWidth = pdf.internal.pageSize.getWidth() - 40;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                pdf.addImage(imgData, 'PNG', 20, 20, imgWidth, imgHeight);
+                pdf.save('技术学习路线思维导图.pdf');
+            });
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('node-modal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Initialize
+        loadProgress();
+        renderMindMap();
+        updateProgressDisplay();
+
+        // Re-render on window resize
+        window.addEventListener('resize', renderMindMap);
+    </script>
+</body>
+</html>
+
