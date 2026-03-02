@@ -7,10 +7,54 @@ body:
   - type: markdown
     attributes:
       value: |
-        使用 AI Agent 自动解决开发任务。
+        ## 📚 AI Agent 必读规范
+        
+        在开始编码前，**必须**阅读以下文档：
+        
+        ### 核心规范
+        1. **[AGENTS.md](../AGENTS.md)** - AI 开发指南（⭐ 最重要）
+           - 代码质量要求
+           - 文件组织规则
+           - Issue 解决流程
+           - 常见错误示例
+        
+        2. **[ARCHITECTURE_PLAN.md](../ARCHITECTURE_PLAN.md)** - 架构设计
+           - 项目目标架构
+           - 目录结构说明
+           - 分层设计原则
+        
+        3. **[backend/README.md](../backend/README.md)** - 后端目录结构
+           - 模块职责说明
+           - 添加新功能的流程
+        
+        4. **[docs/ISSUE_GUIDELINES.md](../docs/ISSUE_GUIDELINES.md)** - Issue 解决指南
+           - 7 步解决流程
+           - 代码规范示例
+           - 测试编写指南
+        
+        ### ⚠️ 重要规则
+        
+        - ✅ **所有新代码必须有单元测试**（覆盖率 > 80%）
+        - ✅ **遵循现有代码风格**（类型注解、docstring）
+        - ✅ **不要修改与任务无关的文件**
+        - ✅ **提交前运行所有测试**：`pytest`
+        - ✅ **代码必须通过 flake8 和 mypy 检查**
+        
+        ### 📁 目录结构规则
+        
+        ```
+        新模型 → backend/app/models/
+        新服务 → backend/app/services/
+        新 API → backend/app/api/v1/
+        新钩子 → backend/app/hooks/
+        新工具 → backend/app/utils/
+        新测试 → backend/tests/unit/ 或 backend/tests/integration/
+        ```
+        
+        ---
         
         **注意**: 
-        - AI Agent 会阅读 AGENTS.md 了解项目规范
+        - AI Agent 会自动阅读上述文档
         - 请提供清晰的验收标准
         - AI 生成的代码需要人工 Review
   
