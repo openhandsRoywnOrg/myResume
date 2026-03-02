@@ -60,6 +60,10 @@ def topic(category, topic):
 def search():
     return render_template('search.html')
 
+@app.route('/mindmap')
+def mindmap():
+    return render_template('mindmap.html')
+
 @app.route('/api/search')
 def api_search():
     query = request.args.get('q', '').lower()
