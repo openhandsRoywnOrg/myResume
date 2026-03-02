@@ -41,6 +41,47 @@ def read_markdown_file(category, topic):
             return html
     return None
 
+def extract_mindmap_data(category, topic):
+    """Extract mindmap structure from markdown file"""
+    file_path = os.path.join(CONTENT_DIR, category, f'{topic}.md')
+    if os.path.exists(file_path):
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+            lines = content.split('\n')
+
+            root = {
+                'id': f'{category}/{topic}',
+                'text': topic.replace('-', ' ').title(),
+                'children': [],
+                'link': f'/topic/{category}/{topic}'
+            }
+
+            stack = [(root, -1)]  # (node, level)
+
+            for line in lines:
+                if line.startswith('#'):
+                    level = len(line.split()[0])
+                    text = line.lstrip('#').strip()
+
+                    if text:
+                        node = {
+                            'id': f'{category}/{topic}/{text}',
+                            'text': text,
+                            'children': [],
+                            'link': f'/topic/{category}/{topic}'
+                        }
+
+                        # Find parent node
+                        while stack and stack[-1][1] >= level:
+                            stack.pop()
+
+                        if stack:
+                            stack[-1][0]['children'].append(node)
+                            stack.append((node, level))
+
+            return root
+    return None
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -52,8 +93,17 @@ def api_categories():
 @app.route('/topic/<category>/<topic>')
 def topic(category, topic):
     content = read_markdown_file(category, topic)
+    mindmap_data = extract_mindmap_data(category, topic)
     if content:
-        return render_template('topic.html', content=content, topic=topic.replace('-', ' ').title(), category=category.replace('-', ' ').title())
+        return render_template('topic.html', content=content, topic=topic.replace('-', ' ').title(), category=category.replace('-', ' ').title(), mindmap_data=mindmap_data)
+    return 'Topic not found', 404
+
+@app.route('/api/mindmap/<category>/<topic>')
+def api_mindmap(category, topic):
+    """API endpoint to get mindmap data"""
+    mindmap_data = extract_mindmap_data(category, topic)
+    if mindmap_data:
+        return jsonify(mindmap_data)
     return 'Topic not found', 404
 
 @app.route('/search')
