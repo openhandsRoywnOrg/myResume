@@ -5,15 +5,13 @@ WARNING: This is a development server. Do not use it in a production deployment.
  * Running on http://127.0.0.1:51880
  * Running on http://172.17.0.2:51880
 Press CTRL+C to quit
-<<<<<<< openhands-fix-issue-10
-127.0.0.1 - - [01/Mar/2026 12:49:25] "GET /topic/ai-ml-basics/ml-fundamentals HTTP/1.1" 200 -
-127.0.0.1 - - [01/Mar/2026 12:49:25] "GET /static/css/style.css HTTP/1.1" 200 -
-127.0.0.1 - - [01/Mar/2026 12:49:35] "GET /topic/ai-ml-basics/ml-fundamentals HTTP/1.1" 200 -
-127.0.0.1 - - [01/Mar/2026 12:49:35] "GET /static/css/style.css HTTP/1.1" 304 -
-127.0.0.1 - - [01/Mar/2026 12:49:58] "GET /topic/automation/automation-ops HTTP/1.1" 200 -
-127.0.0.1 - - [01/Mar/2026 12:49:58] "GET /static/css/style.css HTTP/1.1" 304 -
-=======
-127.0.0.1 - - [02/Mar/2026 05:58:45] "GET /mindmap HTTP/1.1" 200 -
-127.0.0.1 - - [02/Mar/2026 05:58:45] "GET /static/css/mindmap.css HTTP/1.1" 200 -
-127.0.0.1 - - [02/Mar/2026 05:58:45] "GET /static/css/style.css HTTP/1.1" 200 -
->>>>>>> main
+127.0.0.1 - - [02/Mar/2026 09:43:32] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [02/Mar/2026 09:43:32] "GET /static/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [02/Mar/2026 09:43:32] "GET /api/categories HTTP/1.1" 200 -
+127.0.0.1 - - [02/Mar/2026 09:43:48] "GET /topic/linux/linux-basics HTTP/1.1" 200 -
+127.0.0.1 - - [02/Mar/2026 09:43:48] "GET /static/css/style.css HTTP/1.1" 304 -
+127.0.0.1 - - [02/Mar/2026 09:45:23] "GET /topic/linux/linux-basics HTTP/1.1" 200 -
+127.0.0.1 - - [02/Mar/2026 09:45:23] "GET /static/css/style.css HTTP/1.1" 304 -
+127.0.0.1 - - [02/Mar/2026 09:46:02] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [02/Mar/2026 09:46:02] "GET /static/css/style.css HTTP/1.1" 304 -
+127.0.0.1 - - [02/Mar/2026 09:46:02] "GET /api/categories HTTP/1.1" 200 -

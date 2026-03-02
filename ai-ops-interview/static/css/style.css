@@ -13,6 +13,120 @@ body {
     min-height: 100vh;
 }
 
+/* 导航栏样式 - 参考 zsythink.net */
+.navbar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    margin-bottom: 20px;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.nav-menu {
+    list-style: none;
+    display: flex;
+    align-items: center;
+}
+
+.nav-item {
+    position: relative;
+}
+
+.nav-link {
+    display: block;
+    padding: 15px 25px;
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    transition: background 0.3s ease;
+    cursor: pointer;
+}
+
+.nav-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.dropdown-arrow {
+    font-size: 10px;
+    margin-left: 5px;
+    transition: transform 0.3s ease;
+}
+
+.nav-item.active .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+/* 下拉菜单 */
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    min-width: 220px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 0 0 8px 8px;
+    list-style: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1001;
+}
+
+.dropdown-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-menu li {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.dropdown-menu li:last-child {
+    border-bottom: none;
+}
+
+.dropdown-menu a {
+    display: block;
+    padding: 12px 20px;
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.dropdown-menu a:hover {
+    background: #667eea;
+    color: white;
+    padding-left: 25px;
+}
+
+/* 移动端汉堡菜单 */
+.hamburger {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    padding: 10px;
+}
+
+.hamburger span {
+    width: 25px;
+    height: 3px;
+    background: white;
+    margin: 3px 0;
+    border-radius: 3px;
+    transition: 0.3s;
+}
+
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -234,6 +348,72 @@ main {
     font-style: italic;
 }
 
+/* 内容页面排版优化 - 参考 liaoxuefeng.com */
+.topic-title {
+    font-size: 2em;
+    color: #333;
+    border-bottom: 3px solid #667eea;
+    padding-bottom: 15px;
+    margin-bottom: 30px;
+}
+
+.topic-content article {
+    line-height: 1.8;
+    font-size: 16px;
+}
+
+.topic-content article h2 {
+    font-size: 1.6em;
+    margin-top: 40px;
+    padding-left: 15px;
+    border-left: 4px solid #667eea;
+}
+
+.topic-content article h3 {
+    font-size: 1.3em;
+    margin-top: 30px;
+    color: #555;
+}
+
+.topic-content article p {
+    margin: 20px 0;
+    text-align: left;
+}
+
+.topic-content article ul,
+.topic-content article ol {
+    margin: 20px 0;
+    padding-left: 40px;
+}
+
+.topic-content article li {
+    margin: 10px 0;
+    line-height: 1.8;
+}
+
+.topic-content article pre {
+    background: #282c34;
+    border-radius: 6px;
+    padding: 20px;
+    margin: 25px 0;
+    overflow-x: auto;
+}
+
+.topic-content article code {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 0.9em;
+}
+
+.topic-content article blockquote {
+    background: #f6f8fa;
+    border-left: 4px solid #667eea;
+    padding: 15px 20px;
+    margin: 25px 0;
+    color: #555;
+    font-style: normal;
+    border-radius: 0 6px 6px 0;
+}
+
 .breadcrumb {
     margin-top: 15px;
     color: #666;
@@ -323,5 +503,65 @@ footer a {
 
     main, .topic-content {
         padding: 20px;
+    }
+
+    /* 移动端导航栏 */
+    .hamburger {
+        display: flex;
+    }
+
+    .nav-menu {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 10px 0;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .nav-menu.active {
+        display: flex;
+    }
+
+    .nav-item {
+        width: 100%;
+    }
+
+    .nav-link {
+        padding: 12px 20px;
+    }
+
+    .dropdown-menu {
+        position: static;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        box-shadow: none;
+        background: rgba(255, 255, 255, 0.1);
+        display: none;
+        min-width: 100%;
+        border-radius: 0;
+    }
+
+    .dropdown-menu.show {
+        display: block;
+    }
+
+    .dropdown-menu a {
+        color: white;
+        padding: 10px 30px;
+    }
+
+    .dropdown-menu a:hover {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        padding-left: 30px;
+    }
+
+    .dropdown-menu li {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
 }
