@@ -100,34 +100,280 @@
             id: 'root',
             name: '技术学习路线',
             stage: 0,
+            description: '从基础运维开发到 AI 的完整学习路径',
             children: [
                 {
                     id: 'stage1',
                     name: '基础运维开发阶段',
                     stage: 1,
+                    description: '掌握基础运维和开发技能',
                     children: [
-                        { id: 'linux', name: 'Linux/Unix 系统基础', stage
-            statusCircle.setAttribute('cy', -height/2 + 10);
-            statusCircle.setAttribute('r', 6);
+                        { id: 'linux', name: 'Linux/Unix 系统基础', stage: 1, description: '学习 Linux/Unix 操作系统基础' },
+                        { id: 'network', name: '网络基础', stage: 1, description: 'TCP/IP, HTTP, DNS 等网络协议' },
+                        { id: 'shell', name: 'Shell 脚本编程', stage: 1, description: 'Bash 脚本编写和自动化' },
+                        { id: 'git', name: 'Git 版本控制', stage: 1, description: '代码版本管理和协作' },
+                        { id: 'docker', name: '基础容器技术', stage: 1, description: 'Docker 容器化技术' }
+                    ]
+                },
+                {
+                    id: 'stage2',
+                    name: '开发技能阶段',
+                    stage: 2,
+                    description: '提升编程和开发能力',
+                    children: [
+                        { id: 'programming', name: '编程语言', stage: 2, description: 'Python/Go/Node.js 等编程语言' },
+                        { id: 'web', name: 'Web 开发基础', stage: 2, description: '前端和后端 Web 开发' },
+                        { id: 'database', name: '数据库基础', stage: 2, description: 'SQL/NoSQL 数据库' },
+                        { id: 'api', name: 'API 设计与开发', stage: 2, description: 'RESTful API 设计' },
+                        { id: 'cicd', name: 'CI/CD 流程', stage: 2, description: '持续集成和持续部署' }
+                    ]
+                },
+                {
+                    id: 'stage3',
+                    name: '云原生与 DevOps',
+                    stage: 3,
+                    description: '云原生技术和 DevOps 实践',
+                    children: [
+                        { id: 'k8s', name: 'Kubernetes', stage: 3, description: '容器编排平台' },
+                        { id: 'cloud', name: '云服务', stage: 3, description: 'AWS/Azure/GCP 云平台' },
+                        { id: 'monitoring', name: '监控与日志', stage: 3, description: '系统监控和日志管理' },
+                        { id: 'terraform', name: '基础设施即代码', stage: 3, description: 'Terraform 等 IaC 工具' }
+                    ]
+                },
+                {
+                    id: 'stage4',
+                    name: 'AI/ML 进阶阶段',
+                    stage: 4,
+                    description: '人工智能和机器学习',
+                    children: [
+                        { id: 'ml', name: '机器学习基础', stage: 4, description: '机器学习算法和理论' },
+                        { id: 'dl', name: '深度学习框架', stage: 4, description: 'TensorFlow/PyTorch 等框架' },
+                        { id: 'llm', name: 'LLM 应用开发', stage: 4, description: '大语言模型应用开发' },
+                        { id: 'aieng', name: 'AI 工程化实践', stage: 4, description: 'AI 系统部署和优化' }
+                    ]
+                }
+            ]
+        };
+
+        let currentNode = null;
+        let currentZoom = 1;
+        let nodeStatuses = {};
+
+        // Load progress from localStorage
+        function loadProgress() {
+            const saved = localStorage.getItem('mindmapProgress');
+            if (saved) {
+                nodeStatuses = JSON.parse(saved);
+            }
+        }
+
+        // Save progress to localStorage
+        function saveProgress() {
+            localStorage.setItem('mindmapProgress', JSON.stringify(nodeStatuses));
+        }
+
+        // Get node status
+        function getNodeStatus(nodeId) {
+            return nodeStatuses[nodeId] || 'not-started';
+        }
+
+        // Set node status
+        function setNodeStatus(nodeId, status) {
+            nodeStatuses[nodeId] = status;
+            saveProgress();
+            renderMindMap();
+            updateProgressDisplay();
+        }
+
+        // Get color by stage
+        function getStageColor(stage) {
+            const colors = {
+                0: '#2c3e50',
+                1: '#3498db',
+                2: '#9b59b6',
+                3: '#e67e22',
+                4: '#e74c3c'
+            };
+            return colors[stage] || '#95a5a6';
+        }
+
+        // Get status color
+        function getStatusColor(status) {
+            const colors = {
+                'completed': '#27ae60',
+                'in-progress': '#f39c12',
+                'not-started': '#bdc3c7'
+            };
+            return colors[status] || '#bdc3c7';
+        }
+
+        // Create SVG node
+        function createNode(data, x, y, width, height, group) {
+            const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            g.setAttribute('transform', `translate(${x}, ${y})`);
+            g.style.cursor = 'pointer';
+            g.onclick = () => showNodeDetails(data);
+
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            rect.setAttribute('width', width);
+            rect.setAttribute('height', height);
+            rect.setAttribute('rx', 8);
+            rect.setAttribute('ry', 8);
+            rect.setAttribute('fill', getStageColor(data.stage));
+            rect.setAttribute('stroke', '#fff');
+            rect.setAttribute('stroke-width', '2');
+
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('x', width / 2);
+            text.setAttribute('y', height / 2 + 5);
+            text.setAttribute('text-anchor', 'middle');
+            text.setAttribute('fill', '#fff');
+            text.setAttribute('font-size', '12');
+            text.setAttribute('font-weight', 'bold');
+            text.textContent = data.name.length > 10 ? data.name.substring(0, 10) + '...' : data.name;
+
+            const status = getNodeStatus(data.id);
+            const statusColor = getStatusColor(status);
+            const statusCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            statusCircle.setAttribute('cx', width - 15);
+            statusCircle.setAttribute('cy', 15);
+            statusCircle.setAttribute('r', 8);
             statusCircle.setAttribute('fill', statusColor);
+            statusCircle.setAttribute('stroke', '#fff');
+            statusCircle.setAttribute('stroke-width', '2');
 
             g.appendChild(rect);
-            g.appendChild(statusCircle);
             g.appendChild(text);
+            g.appendChild(statusCircle);
             group.appendChild(g);
         }
 
-        // Draw connection line
-        function drawConnection(x1, y1, x2, y2, group) {
-            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            line.setAttribute('x1', x1);
-            line.setAttribute('y1', y1);
-            line.setAttribute('x2', x2);
-            line.setAttribute('y2', y2);
-            line.setAttribute('stroke', '#ccc');
-            line.setAttribute('stroke-width', '2');
-            line.setAttribute('stroke-dasharray', '5,5');
-            group.appendChild(line);
+        // Render mind map recursively
+        function renderMindMap() {
+            const svg = document.getElementById('mindmap');
+            svg.innerHTML = '';
+
+            const containerWidth = svg.clientWidth || 1200;
+            const startY = 50;
+            const nodeWidth = 150;
+            const nodeHeight = 60;
+            const levelHeight = 100;
+
+            // Create main group for transformations
+            const mainGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            mainGroup.setAttribute('transform', `translate(${containerWidth / 2 - nodeWidth / 2}, 0)`);
+            svg.appendChild(mainGroup);
+
+            // Render root node
+            createNode(mindMapData, 0, startY, nodeWidth, nodeHeight, mainGroup);
+
+            // Render children
+            let childIndex = 0;
+            mindMapData.children.forEach(stage => {
+                const childX = (childIndex - mindMapData.children.length / 2 + 0.5) * (nodeWidth + 80);
+                const childY = startY + levelHeight;
+
+                // Draw connection line
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                const startX = nodeWidth / 2;
+                const endX = childX + nodeWidth / 2;
+                const pathData = `M ${startX} ${startY + nodeHeight} L ${startX} ${startY + nodeHeight + 30} L ${endX} ${startY + nodeHeight + 30} L ${endX} ${childY}`;
+                line.setAttribute('d', pathData);
+                line.setAttribute('stroke', getStageColor(stage.stage));
+                line.setAttribute('stroke-width', '3');
+                line.setAttribute('fill', 'none');
+                mainGroup.appendChild(line);
+
+                // Create child node
+                createNode(stage, childX, childY, nodeWidth, nodeHeight, mainGroup);
+
+                // Render grandchildren
+                if (stage.children) {
+                    const grandchildY = childY + levelHeight;
+                    const grandchildSpacing = (nodeWidth + 40);
+                    const totalWidth = (stage.children.length - 1) * grandchildSpacing;
+                    const startGrandchildX = childX - totalWidth / 2;
+
+                    stage.children.forEach((grandchild, gcIndex) => {
+                        const gcX = startGrandchildX + gcIndex * grandchildSpacing;
+
+                        // Draw connection line
+                        const gcLine = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        const gcStartX = childX + nodeWidth / 2;
+                        const gcEndX = gcX + nodeWidth / 2;
+                        const gcPathData = `M ${gcStartX} ${childY + nodeHeight} L ${gcStartX} ${childY + nodeHeight + 30} L ${gcEndX} ${childY + nodeHeight + 30} L ${gcEndX} ${grandchildY}`;
+                        gcLine.setAttribute('d', gcPathData);
+                        gcLine.setAttribute('stroke', getStageColor(grandchild.stage));
+                        gcLine.setAttribute('stroke-width', '2');
+                        gcLine.setAttribute('fill', 'none');
+                        gcLine.setAttribute('stroke-dasharray', '5,5');
+                        mainGroup.appendChild(gcLine);
+
+                        // Create grandchild node
+                        createNode(grandchild, gcX, grandchildY, nodeWidth, nodeHeight, mainGroup);
+                    });
+                }
+
+                childIndex++;
+            });
+
+            // Set SVG height based on content
+            svg.setAttribute('height', startY + levelHeight * 2 + nodeHeight + 50);
+        }
+
+        // Update progress display
+        function updateProgressDisplay() {
+            let totalNodes = 0;
+            let completedNodes = 0;
+            let inProgressNodes = 0;
+
+            function countNodes(node) {
+                totalNodes++;
+                const status = getNodeStatus(node.id);
+                if (status === 'completed') completedNodes++;
+                else if (status === 'in-progress') inProgressNodes++;
+
+                if (node.children) {
+                    node.children.forEach(countNodes);
+                }
+            }
+
+            countNodes(mindMapData);
+
+            const percentage = Math.round((completedNodes / totalNodes) * 100);
+            document.getElementById('overall-progress').style.width = percentage + '%';
+            document.getElementById('progress-text').textContent = `总进度：${percentage}% (${completedNodes}/${totalNodes})`;
+
+            // Update stage progress
+            const stageProgressDiv = document.getElementById('stage-progress');
+            stageProgressDiv.innerHTML = '';
+
+            mindMapData.children.forEach(stage => {
+                let stageTotal = 1;
+                let stageCompleted = 0;
+
+                if (stage.children) {
+                    stageTotal += stage.children.length;
+                    stage.children.forEach(child => {
+                        if (getNodeStatus(child.id) === 'completed') stageCompleted++;
+                    });
+                }
+
+                if (getNodeStatus(stage.id) === 'completed') stageCompleted++;
+
+                const stagePercentage = Math.round((stageCompleted / stageTotal) * 100);
+
+                const stageDiv = document.createElement('div');
+                stageDiv.className = 'stage-progress';
+                stageDiv.innerHTML = `
+                    <div class="stage-name">${stage.name}</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${stagePercentage}%"></div>
+                    </div>
+                    <div class="stage-percentage">${stagePercentage}%</div>
+                `;
+                stageProgressDiv.appendChild(stageDiv);
+            });
         }
 
         // Show node details modal
@@ -194,19 +440,29 @@
         // Zoom functions
         function zoomIn() {
             currentZoom = Math.min(currentZoom + 0.2, 2);
-            svg.style.transform = `scale(${currentZoom})`;
-            svg.style.transformOrigin = 'center top';
+            const svg = document.getElementById('mindmap');
+            const mainGroup = svg.querySelector('g');
+            if (mainGroup) {
+                mainGroup.setAttribute('transform', `scale(${currentZoom})`);
+            }
         }
 
         function zoomOut() {
             currentZoom = Math.max(currentZoom - 0.2, 0.6);
-            svg.style.transform = `scale(${currentZoom})`;
-            svg.style.transformOrigin = 'center top';
+            const svg = document.getElementById('mindmap');
+            const mainGroup = svg.querySelector('g');
+            if (mainGroup) {
+                mainGroup.setAttribute('transform', `scale(${currentZoom})`);
+            }
         }
 
         function resetView() {
             currentZoom = 1;
-            svg.style.transform = 'scale(1)';
+            const svg = document.getElementById('mindmap');
+            const mainGroup = svg.querySelector('g');
+            if (mainGroup) {
+                mainGroup.setAttribute('transform', 'scale(1)');
+            }
         }
 
         // Export functions
