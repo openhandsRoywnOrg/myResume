@@ -1,0 +1,189 @@
+# ===========================================
+# OpenHands 自动处理 AI Task
+# ===========================================
+# 当 Issue 被标记为 'ai-agent' 时自动触发
+# AI Agent 会读取配置并自动实现任务
+# ===========================================
+
+name: OpenHands Auto Process
+
+on:
+  issues:
+    types:
+      - labeled  # 当 Issue 被添加标签时触发
+
+jobs:
+  # 检测是否是 ai-agent 标签
+  check-ai-task:
+    if: github.event.label.name == 'ai-agent'
+    runs-on: ubuntu-latest
+    
+    outputs:
+      is_ai_task: ${{ steps.check.outputs.is_ai_task }}
+    
+    steps:
+      - name: Check if AI task
+        id: check
+        run: echo "is_ai_task=true" >> $GITHUB_OUTPUT
+  
+  # 处理 AI 任务
+  process-ai-task:
+    needs: check-ai-task
+    if: needs.check-ai-task.outputs.is_ai_task == 'true'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 获取完整历史
+      
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      
+      - name: Install dependencies
+        run: |
+          cd backend
+          pip install -r requirements.txt
+          pip install pytest pytest-cov flake8 mypy
+      
+      - name: Read OpenHands config
+        id: read_config
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const config = fs.readFileSync('.openhands/config.yaml', 'utf8');
+            console.log('OpenHands Config loaded');
+            return config;
+      
+      - name: Read Issue details
+        id: read_issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            console.log('Processing Issue #', issue.number);
+            console.log('Title:', issue.title);
+            console.log('Body:', issue.body.substring(0, 500) + '...');
+            
+            // 提取关键信息
+            return {
+              number: issue.number,
+              title: issue.title,
+              body: issue.body,
+              labels: issue.labels.map(l => l.name),
+              user: issue.user.login
+            };
+      
+      - name: Display task info
+        run: |
+          echo "========================================"
+          echo "🤖 OpenHands AI Task Detected"
+          echo "========================================"
+          echo "Issue #${{ fromJson(steps.read_issue.outputs.result).number }}"
+          echo "Title: ${{ fromJson(steps.read_issue.outputs.result).title }}"
+          echo "User: ${{ fromJson(steps.read_issue.outputs.result).user }}"
+          echo "Labels: ${{ join(fromJson(steps.read_issue.outputs.result).labels, ', ') }}"
+          echo "========================================"
+      
+      - name: Setup OpenHands Agent
+        id: setup_openhands
+        uses: openhands/setup-action@v1
+        with:
+          api-key: ${{ secrets.OPENHANDS_API_KEY }}
+          config-file: '.openhands/config.yaml'
+      
+      - name: Run OpenHands Agent
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENHANDS_API_KEY: ${{ secrets.OPENHANDS_API_KEY }}
+          ISSUE_NUMBER: ${{ fromJson(steps.read_issue.outputs.result).number }}
+          ISSUE_BODY: ${{ fromJson(steps.read_issue.outputs.result).body }}
+        run: |
+          echo "🚀 Starting OpenHands Agent..."
+          
+          # 运行 AI Agent
+          openhands-agent \
+            --issue-number $ISSUE_NUMBER \
+            --read-docs "AGENTS.md,ARCHITECTURE_PLAN.md,backend/README.md,docs/ISSUE_GUIDELINES.md" \
+            --config ".openhands/config.yaml" \
+            --auto-test \
+            --auto-pr \
+            --verbose
+          
+          echo "✅ OpenHands Agent completed"
+      
+      - name: Comment on Issue
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issueNumber = context.payload.issue.number;
+            
+            const comment = `
+            ## 🤖 OpenHands Agent 处理完成
+            
+            AI Agent 已经自动处理了这个任务。
+            
+            ### 执行的操作：
+            - ✅ 读取项目规范文档
+            - ✅ 分析任务需求
+            - ✅ 编写代码实现
+            - ✅ 编写单元测试
+            - ✅ 运行测试验证
+            - ✅ 创建 Pull Request
+            
+            ### 下一步：
+            1. 查看生成的 PR
+            2. Review 代码变更
+            3. 运行测试确认
+            4. 合并到 main 分支
+            
+            ---
+            *此评论由 OpenHands Agent 自动生成*
+            `;
+            
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body: comment
+            });
+      
+      - name: Handle errors
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issueNumber = context.payload.issue.number;
+            
+            const comment = `
+            ## ❌ OpenHands Agent 处理失败
+            
+            AI Agent 在处理任务时遇到了错误。
+            
+            ### 可能的原因：
+            - 任务描述不清晰
+            - 缺少必要的配置
+            - 代码冲突
+            - 测试失败
+            
+            ### 建议：
+            1. 检查 Issue 描述是否清晰
+            2. 查看 Actions 日志了解详细错误
+            3. 手动创建分支并实现
+            4. 联系项目维护者
+            
+            ---
+            *此评论由 OpenHands Agent 自动生成*
+            `;
+            
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body: comment
+            });
