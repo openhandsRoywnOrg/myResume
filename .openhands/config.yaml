@@ -1,0 +1,326 @@
+# ===========================================
+# OpenHands Agent 配置文件
+# ===========================================
+# 此文件定义 AI Agent 的行为规范和项目规则
+# AI Agent 在开始工作前会自动读取此配置
+# ===========================================
+
+project:
+  name: "myResume"
+  description: "AI DevOps 面试库 - 包含知识点、面试题、AI 模拟面试、评分系统"
+  repository: "openhandsRoywnOrg/myResume"
+  main_branch: "main"
+  
+  # 技术栈
+  tech_stack:
+    backend: "Flask"
+    database: "PostgreSQL"
+    orm: "SQLAlchemy"
+    testing: "pytest"
+    deployment: "Vercel"
+
+# ===========================================
+# AI Agent 配置
+# ===========================================
+agent:
+  # 必读文档列表（AI 会自动读取这些文档）
+  # 路径相对于项目根目录
+  required_docs:
+    - "AGENTS.md"                    # ⭐ 最重要：AI 开发指南
+    - "ARCHITECTURE_PLAN.md"         # 架构设计
+    - "backend/README.md"            # 后端目录结构
+    - "docs/ISSUE_GUIDELINES.md"     # Issue 解决指南
+    - "backend/docs/CONFIG_GUIDE.md" # 配置指南
+  
+  # 代码风格要求
+  code_style:
+    # 类型注解：required（必须）, optional（可选）, none（不需要）
+    type_annotations: "required"
+    
+    # 文档字符串：required, optional, none
+    docstrings: "required"
+    
+    # 测试覆盖率目标（百分比）
+    test_coverage_target: 80
+    
+    # 代码格式化工具
+    formatter: "black"
+    
+    # Import 排序工具
+    import_sorter: "isort"
+    
+    # Lint 工具
+    linter: "flake8"
+    
+    # 类型检查工具
+    type_checker: "mypy"
+  
+  # 目录结构规则
+  # 定义各类代码应该放在哪个目录
+  directory_rules:
+    # 数据模型必须放在这里
+    models: "backend/app/models/"
+    
+    # 业务逻辑服务必须放在这里
+    services: "backend/app/services/"
+    
+    # API 路由必须放在这里
+    api: "backend/app/api/v1/"
+    
+    # 钩子函数必须放在这里
+    hooks: "backend/app/hooks/"
+    
+    # 工具函数必须放在这里
+    utils: "backend/app/utils/"
+    
+    # 单元测试必须放在这里
+    unit_tests: "backend/tests/unit/"
+    
+    # 集成测试必须放在这里
+    integration_tests: "backend/tests/integration/"
+    
+    # 配置文件必须放在这里
+    configs: "backend/app/"
+  
+  # 文件命名规范
+  file_naming:
+    # Python 文件：snake_case（小写 + 下划线）
+    python_files: "snake_case"
+    
+    # 测试文件必须以 test_ 开头
+    test_files_prefix: "test_"
+    
+    # 模型文件命名：{model_name}.py
+    model_files: "{model_name}.py"
+    
+    # 服务文件命名：{service_name}_service.py
+    service_files: "{service_name}_service.py"
+  
+  # 自动检查（AI 在提交前自动执行）
+  auto_checks:
+    # 运行测试
+    run_tests: true
+    
+    # 检查代码风格
+    check_style: true
+    
+    # 类型检查
+    check_types: true
+    
+    # 验证导入
+    verify_imports: true
+    
+    # 检查测试覆盖率
+    check_coverage: true
+    
+    # 最小覆盖率阈值
+    min_coverage: 80
+  
+  # 禁止操作（AI 不允许做的事情）
+  forbidden_actions:
+    # 不允许直接修改 main 分支
+    - "modify_main_branch_directly"
+    
+    # 不允许删除现有测试
+    - "delete_existing_tests"
+    
+    # 不允许修改与任务无关的文件
+    - "modify_unrelated_files"
+    
+    # 不允许提交包含敏感信息的代码
+    - "commit_sensitive_data"
+    
+    # 不允许跳过测试
+    - "skip_tests"
+  
+  # 自动修复（AI 自动尝试修复的问题）
+  auto_fix:
+    # 自动格式化代码
+    format_code: true
+    
+    # 自动排序 imports
+    sort_imports: true
+    
+    # 自动添加缺失的类型注解（如果可能）
+    add_type_annotations: false  # 谨慎开启，可能改变语义
+
+# ===========================================
+# GitHub 集成配置
+# ===========================================
+github:
+  # 自动创建 Pull Request
+  auto_pr: true
+  
+  # PR 模板路径
+  pr_template: ".github/PULL_REQUEST_TEMPLATE.md"
+  
+  # PR 基础分支（默认）
+  default_base_branch: "main"
+  
+  # 必需的 CI 检查
+  required_checks:
+    - "tests_pass"         # 测试必须通过
+    - "style_check"        # 代码风格检查
+    - "type_check"         # 类型检查
+  
+  # 自动添加的标签
+  auto_labels:
+    - "ai-generated"       # AI 生成的代码
+    - "needs-review"       # 需要人工 Review
+  
+  # 自动指派 Reviewer
+  auto_reviewers:
+    - "tigerbreak"         # 默认 Reviewer
+  
+  # Commit 信息规范
+  commit_message_style:
+    # 格式：type(scope): subject
+    # 例如：feat(models): add User model
+    style: "conventional_commits"
+    
+    # 允许的类型
+    allowed_types:
+      - "feat"      # 新功能
+      - "fix"       # Bug 修复
+      - "docs"      # 文档
+      - "style"     # 代码格式
+      - "refactor"  # 重构
+      - "test"      # 测试
+      - "chore"     # 构建/工具
+    
+    # 必须包含 Issue 编号（如果适用）
+    require_issue_number: true
+
+# ===========================================
+# 测试配置
+# ===========================================
+testing:
+  # 测试框架
+  framework: "pytest"
+  
+  # 测试配置文件
+  config_file: "backend/pytest.ini"
+  
+  # 测试目录
+  test_dirs:
+    - "backend/tests/unit"
+    - "backend/tests/integration"
+  
+  # 测试覆盖率配置
+  coverage:
+    # 覆盖率报告目录
+    report_dir: "backend/htmlcov"
+    
+    # 覆盖率配置文件
+    config_file: "backend/.coveragerc"
+    
+    # 最小覆盖率阈值
+    min_coverage: 80
+    
+    # 覆盖率检查的文件
+    source_dirs:
+      - "backend/app"
+  
+  # 测试运行选项
+  pytest_options:
+    - "-v"           # 详细输出
+    - "--tb=short"   # 简短的 traceback
+    - "--cov=app"    # 覆盖率检查
+    - "--cov-report=term-missing"  # 终端显示缺失行
+
+# ===========================================
+# 代码质量配置
+# ===========================================
+quality:
+  # flake8 配置
+  flake8:
+    config_file: "backend/.flake8"
+    max_line_length: 127
+    ignore:
+      - "E203"  # 空格在 : 之前（与 black 冲突）
+      - "W503"  # 运算符在行首（与 black 冲突）
+  
+  # mypy 配置
+  mypy:
+    config_file: "backend/mypy.ini"
+    ignore_missing_imports: true
+    strict_optional: true
+  
+  # black 配置
+  black:
+    config_file: "backend/pyproject.toml"
+    line_length: 88
+    target_version: "py310"
+
+# ===========================================
+# 文档配置
+# ===========================================
+documentation:
+  # 文档目录
+  docs_dir: "docs"
+  
+  # 后端文档目录
+  backend_docs_dir: "backend/docs"
+  
+  # 文档规范
+  requirements:
+    # 所有公共函数必须有 docstring
+    public_functions_require_docstring: true
+    
+    # 所有类必须有 docstring
+    classes_require_docstring: true
+    
+    # 所有模块必须有 docstring
+    modules_require_docstring: true
+    
+    # API 端点必须有文档
+    api_endpoints_require_docs: true
+
+# ===========================================
+# 环境变量配置
+# ===========================================
+environment:
+  # 必需的环境变量（AI 会检查这些是否已设置）
+  required_vars:
+    - "GITHUB_TOKEN"       # GitHub API 访问令牌
+    - "FLASK_ENV"          # Flask 环境
+  
+  # 可选的环境变量
+  optional_vars:
+    - "LLM_API_KEY"        # LLM API 密钥
+    - "DATABASE_URL"       # 数据库连接
+    - "SECRET_KEY"         # Flask 密钥
+
+# ===========================================
+# 日志配置
+# ===========================================
+logging:
+  # 日志级别
+  level: "INFO"
+  
+  # 日志文件
+  file: "openhands_agent.log"
+  
+  # 日志格式
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+# ===========================================
+# 高级配置
+# ===========================================
+advanced:
+  # 最大重试次数（失败时）
+  max_retries: 3
+  
+  # 每次重试间隔（秒）
+  retry_delay: 5
+  
+  # 超时时间（秒）
+  timeout: 300
+  
+  # 并发限制
+  concurrency_limit: 5
+  
+  # 缓存配置
+  cache:
+    enabled: true
+    ttl: 3600  # 缓存存活时间（秒）
