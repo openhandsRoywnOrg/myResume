@@ -229,6 +229,8 @@
             dropdown.addEventListener('click', function(event) {
                 event.stopPropagation();
             });
+        });
+
         // Mind map data from server
         const mindmapData = {{ mindmap_data|tojson }};
 
