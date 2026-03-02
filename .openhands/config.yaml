@@ -30,6 +30,7 @@ agent:
     - "ARCHITECTURE_PLAN.md"         # 架构设计
     - "backend/README.md"            # 后端目录结构
     - "docs/ISSUE_GUIDELINES.md"     # Issue 解决指南
+    - "docs/DDD_SPEC.md"             # ⭐ NEW: 文档驱动开发规范
     - "backend/docs/CONFIG_GUIDE.md" # 配置指南
   
   # 代码风格要求
