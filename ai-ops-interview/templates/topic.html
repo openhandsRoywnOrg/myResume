@@ -8,8 +8,42 @@
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <ul class="nav-menu">
+                <li class="nav-item dropdown">
+                    <a href="javascript:void(0)" class="nav-link" onclick="toggleDropdown(event, 'linux-dropdown')">
+                        Linux <span class="dropdown-arrow">▼</span>
+                    </a>
+                    <ul class="dropdown-menu" id="linux-dropdown">
+                        <li><a href="/topic/linux/linux-basics">Linux 基础</a></li>
+                        <li><a href="/topic/linux/linux-networking">Linux 网络配置</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a href="javascript:void(0)" class="nav-link" onclick="toggleDropdown(event, 'docker-dropdown')">
+                        Docker <span class="dropdown-arrow">▼</span>
+                    </a>
+                    <ul class="dropdown-menu" id="docker-dropdown">
+                        <li><a href="/topic/docker/docker-basics">Docker 基础</a></li>
+                        <li><a href="/topic/docker/docker-compose">Docker Compose</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a href="javascript:void(0)" class="nav-link" onclick="toggleDropdown(event, 'k8s-dropdown')">
+                        K8s <span class="dropdown-arrow">▼</span>
+                    </a>
+                    <ul class="dropdown-menu" id="k8s-dropdown">
+                        <li><a href="/topic/k8s/k8s-basics">Kubernetes 基础</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
     <div class="container">
-        <header>
+        <header class="page-header">
             <h1>🤖 AI 运维开发面试知识总结</h1>
             <nav class="breadcrumb">
                 <a href="/">首页</a> &gt;
@@ -20,6 +54,7 @@
 
         <main class="topic-content">
             <article>
+                <h1 class="topic-title">{{ topic }}</h1>
                 {{ content|safe }}
             </article>
 
@@ -32,5 +67,42 @@
             <p>AI 运维开发面试知识总结 | 参照 <a href="https://www.mianshiya.com/" target="_blank">面试导航</a> 风格</p>
         </footer>
     </div>
+
+    <script>
+        // 切换下拉菜单
+        function toggleDropdown(event, dropdownId) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            // 关闭所有其他下拉菜单
+            const allDropdowns = document.querySelectorAll('.dropdown-menu');
+            allDropdowns.forEach(dropdown => {
+                if (dropdown.id !== dropdownId) {
+                    dropdown.classList.remove('show');
+                }
+            });
+
+            // 切换当前下拉菜单
+            const dropdown = document.getElementById(dropdownId);
+            dropdown.classList.toggle('show');
+        }
+
+        // 点击外部关闭下拉菜单
+        document.addEventListener('click', function(event) {
+            const dropdowns = document.querySelectorAll('.dropdown-menu');
+            dropdowns.forEach(dropdown => {
+                if (!dropdown.contains(event.target)) {
+                    dropdown.classList.remove('show');
+                }
+            });
+        });
+
+        // 阻止事件冒泡
+        document.querySelectorAll('.dropdown-menu').forEach(dropdown => {
+            dropdown.addEventListener('click', function(event) {
+                event.stopPropagation();
+            });
+        });
+    </script>
 </body>
 </html>
