@@ -10,7 +10,84 @@
 - 🔐 用户权限管理
 - 📈 学习进度追踪
 
-## ⚠️ 重要：代码质量要求
+## 📊 项目状态
+
+**当前阶段**: Phase 2 - 功能扩展与优化 (80% 完成)  
+**最新进展**: 2025-03-03
+
+### 已完成功能 ✅
+- ✅ 知识点展示系统（Markdown 存储）
+- ✅ 统一导航栏（4 个主菜单，宽版下拉）
+- ✅ 知识地图（思维导图、技术路线、全景图）
+- ✅ AI 应用开发菜单（LangChain, LangGraph, MCP, Agent）
+- ✅ AI 软件工程菜单（DDD, TDD, 需求驱动）
+- ✅ 权限系统（RBAC 模型，JWT 认证）
+- ✅ 响应式设计（桌面端 + 移动端）
+
+### 进行中功能 🚧
+- 🚧 后端服务集成
+- 🚧 数据库实现
+- 🚧 用户系统
+
+详细进展查看：[项目进展报告](docs/PROJECT_PROGRESS.md)
+
+## 🏗️ 项目架构
+
+### 目录结构
+```
+myResume/
+├── ai-ops-interview/          # 前端应用（Flask）
+│   ├── app.py                 # 主应用（270 行）
+│   ├── templates/             # HTML 模板（11 个文件）
+│   │   ├── index.html        # 首页
+│   │   ├── mindmap.html      # 思维导图
+│   │   ├── langchain.html    # LangChain 页面
+│   │   ├── doc_driven.html   # 文档驱动开发
+│   │   ├── tech_roadmap.html # 技术路线
+│   │   ├── ai_devops_landscape.html  # AI DevOps 全景图
+│   │   └── content_page.html # 通用内容页
+│   ├── static/css/
+│   │   └── style.css         # 样式（1276 行）
+│   └── content/              # Markdown 内容
+│       ├── linux/
+│       ├── docker/
+│       ├── k8s/
+│       └── ...
+│
+├── backend/                   # 后端服务（开发中）
+│   ├── app/
+│   │   ├── models/           # 数据模型
+│   │   │   └── user.py       # 用户模型（4 角色）
+│   │   ├── api/              # API 路由
+│   │   │   ├── v1/
+│   │   │   └── deps.py       # 认证依赖
+│   │   ├── hooks/            # 钩子系统
+│   │   ├── services/         # 业务逻辑
+│   │   ├── config.py
+│   │   ├── main.py
+│   │   └── extensions.py
+│   └── tests/                # 测试代码
+│       ├── unit/
+│       │   └── test_permissions.py
+│       └── conftest.py
+│
+├── docs/                      # 项目文档
+│   ├── PROJECT_PROGRESS.md   # 项目进展 ⭐
+│   ├── ARCHITECTURE_PLAN.md  # 架构设计
+│   ├── PERMISSION_TEST_REPORT.md  # 权限测试
+│   ├── ISSUE_GUIDELINES.md   # Issue 指南
+│   ├── DDD_SPEC.md           # DDD 规范
+│   ├── design/               # 设计模板
+│   └── requirements/         # 需求模板
+│
+└── .github/                   # GitHub 配置
+    ├── workflows/
+    │   └── ci.yml            # CI/CD
+    └── ISSUE_TEMPLATE/
+        ├── feature_request.md
+        ├── bug_report.md
+        └── ai_task.md
+```
 
 ### 在修改代码前必须遵守的规则
 
