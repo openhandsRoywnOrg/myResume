@@ -4,13 +4,14 @@ pytest 配置和共享 fixtures
 import pytest
 from app import create_app, db
 from app.models.user import User
+from flask import Flask
 from flask.testing import FlaskClient
 
 
 @pytest.fixture(scope='session')
 def app():
     """创建测试应用实例"""
-    app = create_app(testing=True)
+    app = create_app('testing')
     
     with app.app_context():
         db.create_all()
