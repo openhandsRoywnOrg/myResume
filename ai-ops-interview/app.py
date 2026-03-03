@@ -86,6 +86,10 @@ def extract_mindmap_data(category, topic):
 def index():
     return render_template('index.html')
 
+@app.route('/pro')
+def index_pro():
+    return render_template('index-pro.html')
+
 @app.route('/api/categories')
 def api_categories():
     return jsonify(get_categories())
