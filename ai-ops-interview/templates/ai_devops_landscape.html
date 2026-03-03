@@ -1,0 +1,295 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI DevOps 全景图 - 全流程落地地图</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <div class="nav-container">
+                <ul class="nav-menu">
+                    <li class="nav-item"><a href="/" class="nav-link">🏠 首页</a></li>
+                    <li class="nav-item"><a href="/mindmap" class="nav-link">🧠 思维导图</a></li>
+                    <li class="nav-item"><a href="/maps/tech-roadmap" class="nav-link">🛣️ 技术路线</a></li>
+                    <li class="nav-item"><a href="/maps/ai-devops-landscape" class="nav-link active">🌐 AI DevOps 全景图</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <main class="content-page">
+            <div class="page-header">
+                <h1>🌐 AI DevOps 全景落地地图</h1>
+                <p class="subtitle">从开发到生产的完整流程图</p>
+            </div>
+
+            <div class="content-body">
+                <section class="topic-section">
+                    <h2>📊 AI DevOps 全景架构</h2>
+                    <div class="landscape-overview">
+                        <p>AI DevOps (也称为 MLOps) 是将 DevOps 理念应用于机器学习/AI 系统开发的实践方法。它涵盖了从数据准备、模型开发、训练、部署到监控的完整生命周期。</p>
+                    </div>
+
+                    <div class="landscape-diagram">
+                        <div class="landscape-layer">
+                            <h3>📥 数据层</h3>
+                            <div class="layer-components">
+                                <div class="component">数据采集</div>
+                                <div class="component">数据清洗</div>
+                                <div class="component">特征工程</div>
+                                <div class="component">数据存储</div>
+                            </div>
+                        </div>
+
+                        <div class="landscape-arrow">↓</div>
+
+                        <div class="landscape-layer">
+                            <h3>🧠 开发层</h3>
+                            <div class="layer-components">
+                                <div class="component">模型选择</div>
+                                <div class="component">模型训练</div>
+                                <div class="component">超参调优</div>
+                                <div class="component">模型评估</div>
+                            </div>
+                        </div>
+
+                        <div class="landscape-arrow">↓</div>
+
+                        <div class="landscape-layer">
+                            <h3>🚀 部署层</h3>
+                            <div class="layer-components">
+                                <div class="component">模型打包</div>
+                                <div class="component">服务化</div>
+                                <div class="component">A/B 测试</div>
+                                <div class="component">灰度发布</div>
+                            </div>
+                        </div>
+
+                        <div class="landscape-arrow">↓</div>
+
+                        <div class="landscape-layer">
+                            <h3>📈 运维层</h3>
+                            <div class="layer-components">
+                                <div class="component">性能监控</div>
+                                <div class="component">数据漂移</div>
+                                <div class="component">模型更新</div>
+                                <div class="component">告警系统</div>
+                            </div>
+                        </div>
+
+                        <div class="landscape-arrow">↓</div>
+
+                        <div class="landscape-layer">
+                            <h3>🔄 治理层</h3>
+                            <div class="layer-components">
+                                <div class="component">版本控制</div>
+                                <div class="component">实验追踪</div>
+                                <div class="component">合规审计</div>
+                                <div class="component">文档管理</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="topic-section">
+                    <h2>🛠️ 技术栈全景</h2>
+                    <div class="tech-stack-grid">
+                        <div class="stack-category">
+                            <h3>📊 数据工具</h3>
+                            <ul>
+                                <li><strong>数据采集:</strong> Apache Kafka, Fluentd</li>
+                                <li><strong>数据存储:</strong> S3, HDFS, Delta Lake</li>
+                                <li><strong>数据处理:</strong> Spark, Pandas, Dask</li>
+                                <li><strong>特征存储:</strong> Feast, Tecton</li>
+                            </ul>
+                        </div>
+
+                        <div class="stack-category">
+                            <h3>🧠 开发框架</h3>
+                            <ul>
+                                <li><strong>深度学习:</strong> PyTorch, TensorFlow</li>
+                                <li><strong>机器学习:</strong> Scikit-learn, XGBoost</li>
+                                <li><strong>AutoML:</strong> H2O.ai, Auto-sklearn</li>
+                                <li><strong>实验管理:</strong> MLflow, Weights & Biases</li>
+                            </ul>
+                        </div>
+
+                        <div class="stack-category">
+                            <h3>🚀 部署平台</h3>
+                            <ul>
+                                <li><strong>容器化:</strong> Docker, Podman</li>
+                                <li><strong>编排:</strong> Kubernetes, Nomad</li>
+                                <li><strong>服务化:</strong> Seldon, KServe, BentoML</li>
+                                <li><strong>Serverless:</strong> AWS Lambda, Cloud Functions</li>
+                            </ul>
+                        </div>
+
+                        <div class="stack-category">
+                            <h3>📈 监控工具</h3>
+                            <ul>
+                                <li><strong>指标监控:</strong> Prometheus, Grafana</li>
+                                <li><strong>日志管理:</strong> ELK Stack, Loki</li>
+                                <li><strong>模型监控:</strong> Evidently, Arize</li>
+                                <li><strong>APM:</strong> New Relic, Datadog</li>
+                            </ul>
+                        </div>
+
+                        <div class="stack-category">
+                            <h3>🔄 CI/CD 工具</h3>
+                            <ul>
+                                <li><strong>CI/CD:</strong> Jenkins, GitLab CI, GitHub Actions</li>
+                                <li><strong>代码质量:</strong> SonarQube, CodeClimate</li>
+                                <li><strong>测试框架:</strong> pytest, Great Expectations</li>
+                                <li><strong>部署工具:</strong> ArgoCD, Spinnaker</li>
+                            </ul>
+                        </div>
+
+                        <div class="stack-category">
+                            <h3>🔐 治理与安全</h3>
+                            <ul>
+                                <li><strong>版本控制:</strong> Git, DVC</li>
+                                <li><strong>数据血缘:</strong> Marquez, DataHub</li>
+                                <li><strong>模型注册:</strong> MLflow Registry</li>
+                                <li><strong>安全合规:</strong> HashiCorp Vault</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="topic-section">
+                    <h2>📋 实施路线图</h2>
+                    <div class="implementation-steps">
+                        <div class="impl-step">
+                            <div class="step-badge">Step 1</div>
+                            <h3>评估现状</h3>
+                            <p>评估当前的技术栈、团队能力、数据成熟度</p>
+                            <ul>
+                                <li>现有基础设施评估</li>
+                                <li>团队技能盘点</li>
+                                <li>数据质量评估</li>
+                                <li>确定优先级用例</li>
+                            </ul>
+                        </div>
+
+                        <div class="impl-step">
+                            <div class="step-badge">Step 2</div>
+                            <h3>设计架构</h3>
+                            <p>设计适合组织的 AI DevOps 架构</p>
+                            <ul>
+                                <li>选择合适的工具链</li>
+                                <li>设计数据流水线</li>
+                                <li>规划部署策略</li>
+                                <li>制定监控方案</li>
+                            </ul>
+                        </div>
+
+                        <div class="impl-step">
+                            <div class="step-badge">Step 3</div>
+                            <h3>试点项目</h3>
+                            <p>选择 1-2 个项目进行试点</p>
+                            <ul>
+                                <li>小范围验证方案</li>
+                                <li>收集反馈和指标</li>
+                                <li>优化流程和工具</li>
+                                <li>建立最佳实践</li>
+                            </ul>
+                        </div>
+
+                        <div class="impl-step">
+                            <div class="step-badge">Step 4</div>
+                            <h3>规模化推广</h3>
+                            <p>将成功经验推广到更多项目</p>
+                            <ul>
+                                <li>建立平台团队</li>
+                                <li>提供培训和文档</li>
+                                <li>自动化常见任务</li>
+                                <li>持续改进优化</li>
+                            </ul>
+                        </div>
+
+                        <div class="impl-step">
+                            <div class="step-badge">Step 5</div>
+                            <h3>持续优化</h3>
+                            <p>建立持续改进机制</p>
+                            <ul>
+                                <li>定期回顾和评估</li>
+                                <li>引入新技术和工具</li>
+                                <li>优化性能和成本</li>
+                                <li>知识分享和传承</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="topic-section">
+                    <h2>💡 最佳实践</h2>
+                    <div class="best-practices">
+                        <div class="practice-card">
+                            <h3>🎯 从小处着手</h3>
+                            <p>不要试图一次性构建完整的平台。从一个具体的用例开始，逐步扩展。</p>
+                        </div>
+                        <div class="practice-card">
+                            <h3>🔄 自动化优先</h3>
+                            <p>尽可能自动化重复性任务，减少人为错误，提高效率。</p>
+                        </div>
+                        <div class="practice-card">
+                            <h3>📊 数据驱动决策</h3>
+                            <p>建立完善的指标体系，用数据指导优化方向。</p>
+                        </div>
+                        <div class="practice-card">
+                            <h3>🤝 跨团队协作</h3>
+                            <p>数据科学家、工程师、运维人员需要紧密协作。</p>
+                        </div>
+                        <div class="practice-card">
+                            <h3>📚 文档和培训</h3>
+                            <p>建立完善的文档体系，定期进行培训和知识分享。</p>
+                        </div>
+                        <div class="practice-card">
+                            <h3>🔒 安全和合规</h3>
+                            <p>从设计阶段就考虑安全性和合规要求。</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="topic-section">
+                    <h2>❓ 常见挑战与解决方案</h2>
+                    <div class="challenges-list">
+                        <div class="challenge-item">
+                            <h4>🔴 挑战 1: 数据质量问题</h4>
+                            <p><strong>问题:</strong> 数据不完整、不一致、有噪声</p>
+                            <p><strong>解决方案:</strong> 建立数据质量管理体系，实施数据验证和监控</p>
+                        </div>
+                        <div class="challenge-item">
+                            <h4>🔴 挑战 2: 模型漂移</h4>
+                            <p><strong>问题:</strong> 生产环境数据分布变化导致模型性能下降</p>
+                            <p><strong>解决方案:</strong> 实施持续监控，建立自动重训练机制</p>
+                        </div>
+                        <div class="challenge-item">
+                            <h4>🔴 挑战 3: 部署复杂性</h4>
+                            <p><strong>问题:</strong> 模型部署涉及多个系统和依赖</p>
+                            <p><strong>解决方案:</strong> 使用容器化和编排技术，标准化部署流程</p>
+                        </div>
+                        <div class="challenge-item">
+                            <h4>🔴 挑战 4: 团队协作障碍</h4>
+                            <p><strong>问题:</strong> 数据科学家和工程师沟通不畅</p>
+                            <p><strong>解决方案:</strong> 建立跨职能团队，使用协作工具，定期同步</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="back-link">
+                <a href="/maps/tech-roadmap" class="btn-back">← 技术路线</a>
+                <a href="/mindmap" class="btn-next">思维导图 →</a>
+            </div>
+        </main>
+
+        <footer>
+            <p>AI 运维开发面试知识总结</p>
+        </footer>
+    </div>
+</body>
+</html>
