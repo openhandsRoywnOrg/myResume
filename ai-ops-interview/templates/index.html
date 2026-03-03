@@ -122,49 +122,12 @@
             </div>
         </nav>
 
-        <nav class="categories" id="categories">
-            <!-- Categories will be loaded here -->
-        </nav>
-
-        <main>
-            <section class="intro">
-                <h2>📚 知识体系</h2>
-                <p>本网站涵盖了 AI 运维开发（AI Ops / MLOps）的核心知识点，包括 AI/ML 基础、模型部署、监控日志、自动化运维、CI/CD for ML、容器化与编排等内容。</p>
-            </section>
-
-            <section class="features">
-                <div class="feature-card">
-                    <h3>🎯 分类清晰</h3>
-                    <p>六大核心模块，系统化知识体系</p>
-                </div>
-                <div class="feature-card">
-                    <h3>📖 详细解析</h3>
-                    <p>每个知识点都有深入讲解和示例</p>
-                </div>
-                <div class="feature-card">
-                    <h3>❓ 面试题库</h3>
-                    <p>常见面试题与参考答案</p>
-                </div>
-                <div class="feature-card">
-                    <h3>🔍 快速搜索</h3>
-                    <p>支持全文搜索，快速定位知识点</p>
-                </div>
-                <div class="feature-card" style="grid-column: 1 / -1; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-                    <h3>🧠 技术学习路线思维导图</h3>
-                    <p>可视化学习路径，从基础运维开发到 AI 的完整学习路线，支持进度追踪和导出</p>
-                    <a href="/mindmap" class="mindmap-btn">立即查看思维导图</a>
-                </div>
-            </section>
-        </main>
-
         <footer>
             <p>AI 运维开发面试知识总结 | 参照 <a href="https://www.mianshiya.com/" target="_blank">面试导航</a> 风格</p>
         </footer>
     </div>
 
     <script>
-        let categoriesData = [];
-
         // 切换下拉菜单
         function toggleDropdown(event, dropdownId) {
             event.preventDefault();
@@ -199,47 +162,6 @@
                 event.stopPropagation();
             });
         });
-
-        async function loadCategories() {
-            try {
-                const response = await fetch('/api/categories');
-                categoriesData = await response.json();
-                renderCategories();
-            } catch (error) {
-                console.error('Error loading categories:', error);
-            }
-        }
-
-        function renderCategories() {
-            const container = document.getElementById('categories');
-            container.innerHTML = categoriesData.map(category => `
-                <div class="category">
-                    <h2>${category.name}</h2>
-                    <div class="topics">
-                        ${category.topics.map(topic => `
-                            <a href="/topic/${category.id}/${topic.id}" class="topic-link">
-                                ${topic.name}
-                            </a>
-                        `).join('')}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function search() {
-            const query = document.getElementById('searchInput').value;
-            if (query) {
-                window.location.href = `/search?q=${encodeURIComponent(query)}`;
-            }
-        }
-
-        document.getElementById('searchInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                search();
-            }
-        });
-
-        loadCategories();
     </script>
 </body>
 </html>
