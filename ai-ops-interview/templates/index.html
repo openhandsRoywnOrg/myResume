@@ -1,166 +1,181 @@
-
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI 运维开发面试知识总结</title>
+    <title>AI DevOps Pro - Master the Skills. Land the Job.</title>
     <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖⚙️</text></svg>">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🤖 AI 运维开发面试知识总结</h1>
-            <p class="subtitle">AI Ops / MLOps 面试必备知识点</p>
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="搜索知识点...">
-                <button onclick="search()">搜索</button>
-            </div>
-        </header>
+    <!-- Navigation -->
+    <nav class="navbar-pro">
+        <div class="nav-brand">
+            <span class="logo">🤖⚙️</span>
+            <span class="title">AI DevOps Pro</span>
+        </div>
+        
+        <div class="nav-search" onsubmit="handleSearch(event)">
+            <input type="text" id="searchInput" placeholder="Find open source repos" onkeypress="if(event.key==='Enter')handleSearch()">
+            <button class="search-btn" onclick="handleSearch()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+            </button>
+        </div>
+        </div>
+        
+        <button class="theme-toggle" onclick="toggleTheme()">
+            <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+            <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;">
+                <circle cx="12" cy="12" r="5"></circle>
+                <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+            </svg>
+        </button>
+    </nav>
 
-        <!-- 导航栏 -->
-        <nav class="navbar">
-            <div class="nav-container">
-                <ul class="nav-menu">
-                    <li class="nav-item dropdown">
-                        <a href="javascript:void(0)" class="nav-link nav-link-tech" onclick="toggleDropdown(event, 'tech-dropdown')">
-                            💻 技术基础 <span class="dropdown-arrow">▼</span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-wide" id="tech-dropdown">
-                            <li class="dropdown-section">
-                                <h4>🐧 操作系统</h4>
-                                <ul>
-                                    <li><a href="/topic/linux/linux-basics">🐧 Linux 基础</a><span class="desc">命令行与系统管理</span></li>
-                                    <li><a href="/topic/linux/linux-networking">🌐 Linux 网络配置</a><span class="desc">网络设置与故障排查</span></li>
-                                </ul>
-                            </li>
-                            <li class="dropdown-section">
-                                <h4>🐳 容器技术</h4>
-                                <ul>
-                                    <li><a href="/topic/docker/docker-basics">🐳 Docker 基础</a><span class="desc">容器化技术应用</span></li>
-                                    <li><a href="/topic/docker/docker-compose">🎼 Docker Compose</a><span class="desc">多容器编排管理</span></li>
-                                </ul>
-                            </li>
-                            <li class="dropdown-section">
-                                <h4>☸️ 容器编排</h4>
-                                <ul>
-                                    <li><a href="/topic/k8s/k8s-basics">☸️ Kubernetes 基础</a><span class="desc">容器编排平台</span></li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a href="javascript:void(0)" class="nav-link nav-link-ai-app" onclick="toggleDropdown(event, 'ai-app-dropdown')">
-                            🤖 AI 应用开发 <span class="dropdown-arrow">▼</span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-wide" id="ai-app-dropdown">
-                            <li class="dropdown-section">
-                                <h4>🦜 框架与工具</h4>
-                                <ul>
-                                    <li><a href="/ai-apps/langchain">🦜 LangChain</a><span class="desc">LLM 应用开发框架</span></li>
-                                    <li><a href="/ai-apps/langgraph">🕸️ LangGraph</a><span class="desc">构建状态化 Agent 工作流</span></li>
-                                    <li><a href="/ai-apps/mcp">🔌 MCP</a><span class="desc">Model Context Protocol</span></li>
-                                </ul>
-                            </li>
-                            <li class="dropdown-section">
-                                <h4>🤝 Agent 协同</h4>
-                                <ul>
-                                    <li><a href="/ai-apps/agent-collaboration">👥 多 Agent 协同</a><span class="desc">Agent 间协作与通信</span></li>
-                                    <li><a href="/ai-apps/agent-orchestration">🎼 Agent 编排</a><span class="desc">复杂任务调度与管理</span></li>
-                                    <li><a href="/ai-apps/agent-evaluation">📊 Agent 评估</a><span class="desc">性能与效果评估</span></li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a href="javascript:void(0)" class="nav-link nav-link-ai-se" onclick="toggleDropdown(event, 'ai-se-dropdown')">
-                            📐 AI 软件工程 <span class="dropdown-arrow">▼</span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-wide" id="ai-se-dropdown">
-                            <li class="dropdown-section">
-                                <h4>📋 开发方法论</h4>
-                                <ul>
-                                    <li><a href="/ai-se/doc-driven">📄 文档驱动开发</a><span class="desc">DDD 与文档先行</span></li>
-                                    <li><a href="/ai-se/test-driven">✅ 测试驱动开发</a><span class="desc">TDD 与自动化测试</span></li>
-                                    <li><a href="/ai-se/requirement-driven">🎯 需求驱动开发</a><span class="desc">需求分析与拆解</span></li>
-                                </ul>
-                            </li>
-                            <li class="dropdown-section">
-                                <h4>🔄 工程流程</h4>
-                                <ul>
-                                    <li><a href="/ai-se/ai-workflow">⚙️ AI 工程流程</a><span class="desc">完整开发工作流</span></li>
-                                    <li><a href="/ai-se/code-review">🔍 AI 代码审查</a><span class="desc">自动化 Code Review</span></li>
-                                    <li><a href="/ai-se/continuous-learning">📚 持续学习</a><span class="desc">知识更新与迭代</span></li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a href="javascript:void(0)" class="nav-link nav-link-maps" onclick="toggleDropdown(event, 'maps-dropdown')">
-                            🗺️ 知识地图 <span class="dropdown-arrow">▼</span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-wide" id="maps-dropdown">
-                            <li class="dropdown-section">
-                                <h4>📊 学习导航</h4>
-                                <ul>
-                                    <li><a href="/mindmap">🧠 思维导图</a><span class="desc">可视化知识结构图</span></li>
-                                    <li><a href="/maps/tech-roadmap">🛣️ 技术路线</a><span class="desc">完整学习路径规划</span></li>
-                                    <li><a href="/maps/ai-devops-landscape">🌐 AI DevOps 全景图</a><span class="desc">全流程落地地图</span></li>
-                                </ul>
-                            </li>
-                            <li class="dropdown-section">
-                                <h4>🎯 能力模型</h4>
-                                <ul>
-                                    <li><a href="/maps/skill-matrix">📐 技能矩阵</a><span class="desc">能力评估与提升</span></li>
-                                    <li><a href="/maps/career-path">💼 职业发展</a><span class="desc">职业路径规划</span></li>
-                                    <li><a href="/maps/certification">📜 认证指南</a><span class="desc">行业认证准备</span></li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </nav>
+    <!-- Main Content -->
+    <main class="main-content-pro">
+        <!-- Hero Section -->
+        <section class="hero-section-pro">
+            <h1 class="hero-title">AI DevOps Pro</h1>
+            <p class="hero-tagline">Master the Skills. Land the Job.</p>
+            <p class="hero-subtitle">
+                Your ultimate knowledge base for AI DevOps excellence.<br>
+                Continuously updated with the latest industry trends and essential skills.
+            </p>
+        </section>
 
-        <footer>
-            <p>AI 运维开发面试知识总结 | 参照 <a href="https://www.mianshiya.com/" target="_blank">面试导航</a> 风格</p>
-        </footer>
-    </div>
+        <!-- Featured Skill Paths -->
+        <section class="skills-section">
+            <h2 class="section-title">Featured Skill Paths</h2>
+            <div class="skills-grid">
+                <a href="/topic/linux/linux-basics" class="skill-card">
+                    <div class="skill-icon">🐧</div>
+                    <h3>Linux Foundation</h3>
+                    <p>Master the fundamentals of Linux/Unix systems</p>
+                    <div class="skill-rating">⭐⭐⭐⭐☆</div>
+                    <span class="explore-link">Explore →</span>
+                </a>
+                
+                <a href="/topic/docker/docker-basics" class="skill-card">
+                    <div class="skill-icon">🐳</div>
+                    <h3>Docker & Containers</h3>
+                    <p>Containerization technologies for modern deployments</p>
+                    <div class="skill-rating">⭐⭐⭐⭐☆</div>
+                    <span class="explore-link">Explore →</span>
+                </a>
+                
+                <a href="/topic/k8s/k8s-basics" class="skill-card">
+                    <div class="skill-icon">☸️</div>
+                    <h3>Kubernetes</h3>
+                    <p>Container orchestration at scale</p>
+                    <div class="skill-rating">⭐⭐⭐☆☆</div>
+                    <span class="explore-link">Explore →</span>
+                </a>
+                
+                <a href="/topic/ai-ml-basics/ml-fundamentals" class="skill-card">
+                    <div class="skill-icon">🤖</div>
+                    <h3>AI/ML Fundamentals</h3>
+                    <p>Machine learning and deep learning essentials</p>
+                    <div class="skill-rating">⭐⭐☆☆☆</div>
+                    <span class="explore-link">Explore →</span>
+                </a>
+                
+                <a href="/ai-apps/langchain" class="skill-card">
+                    <div class="skill-icon">🦜</div>
+                    <h3>LLM Applications</h3>
+                    <p>Build AI applications with LangChain and beyond</p>
+                    <div class="skill-rating">⭐⭐⭐☆☆</div>
+                    <span class="explore-link">Explore →</span>
+                </a>
+                
+                <a href="/maps/ai-devops-landscape" class="skill-card">
+                    <div class="skill-icon">📊</div>
+                    <h3>MLOps & AI Ops</h3>
+                    <p>Production ML systems and operations</p>
+                    <div class="skill-rating">⭐⭐⭐☆☆</div>
+                    <span class="explore-link">Explore →</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Value Proposition -->
+        <section class="value-section">
+            <div class="value-grid">
+                <div class="value-card">
+                    <div class="value-icon">📈</div>
+                    <h3>Industry-Aligned</h3>
+                    <p>Skills curated based on current job market demands and industry trends</p>
+                </div>
+                
+                <div class="value-card">
+                    <div class="value-icon">🔄</div>
+                    <h3>Continuously Updated</h3>
+                    <p>Always fresh with the latest tools, frameworks, and best practices</p>
+                </div>
+                
+                <div class="value-card">
+                    <div class="value-icon">🎯</div>
+                    <h3>Career-Focused</h3>
+                    <p>Designed to help you land your dream job in AI DevOps</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer-pro">
+        <p>AI DevOps Pro - Your Path to Excellence</p>
+        <p>© 2025 AI DevOps Pro. All rights reserved.</p>
+    </footer>
 
     <script>
-        // 切换下拉菜单
-        function toggleDropdown(event, dropdownId) {
-            event.preventDefault();
-            event.stopPropagation();
-
-            // 关闭所有其他下拉菜单
-            const allDropdowns = document.querySelectorAll('.dropdown-menu');
-            allDropdowns.forEach(dropdown => {
-                if (dropdown.id !== dropdownId) {
-                    dropdown.classList.remove('show');
-                }
-            });
-
-            // 切换当前下拉菜单
-            const dropdown = document.getElementById(dropdownId);
-            dropdown.classList.toggle('show');
+        // Theme toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', newTheme);
+            
+            const moonIcon = document.querySelector('.icon-moon');
+            const sunIcon = document.querySelector('.icon-sun');
+            
+            if (newTheme === 'light') {
+                moonIcon.style.display = 'block';
+                sunIcon.style.display = 'none';
+            } else {
+                moonIcon.style.display = 'none';
+                sunIcon.style.display = 'block';
+            }
+            
+            localStorage.setItem('theme', newTheme);
         }
 
-        // 点击外部关闭下拉菜单
-        document.addEventListener('click', function(event) {
-            const dropdowns = document.querySelectorAll('.dropdown-menu');
-            dropdowns.forEach(dropdown => {
-                if (!dropdown.contains(event.target)) {
-                    dropdown.classList.remove('show');
-                }
-            });
-        });
+        // Search function
+        function handleSearch() {
+            const query = document.getElementById("searchInput").value;
+            if (query) {
+                window.location.href = `/search?q=${encodeURIComponent(query)}`;
+            }
+        }
 
-        // 阻止事件冒泡
-        document.querySelectorAll('.dropdown-menu').forEach(dropdown => {
-            dropdown.addEventListener('click', function(event) {
-                event.stopPropagation();
-            });
+        // Load saved theme
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            const html = document.documentElement;
+            html.setAttribute('data-theme', savedTheme);
+            
+            const moonIcon = document.querySelector('.icon-moon');
+            const sunIcon = document.querySelector('.icon-sun');
+            
+            if (savedTheme === 'dark') {
+                moonIcon.style.display = 'none';
+                sunIcon.style.display = 'block';
+            }
         });
     </script>
 </body>
