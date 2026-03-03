@@ -569,6 +569,7 @@ footer a {
 /* ========== AI 应用开发和 AI 软件工程菜单样式 ========== */
 
 /* 特殊菜单项样式 */
+.nav-link-tech,
 .nav-link-ai-app,
 .nav-link-ai-se,
 .nav-link-maps {
@@ -577,6 +578,7 @@ footer a {
     margin: 5px 0;
 }
 
+.nav-link-tech:hover,
 .nav-link-ai-app:hover,
 .nav-link-ai-se:hover,
 .nav-link-maps:hover {

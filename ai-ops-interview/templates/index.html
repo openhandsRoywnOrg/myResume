@@ -23,29 +23,30 @@
             <div class="nav-container">
                 <ul class="nav-menu">
                     <li class="nav-item dropdown">
-                        <a href="javascript:void(0)" class="nav-link" onclick="toggleDropdown(event, 'linux-dropdown')">
-                            Linux <span class="dropdown-arrow">▼</span>
+                        <a href="javascript:void(0)" class="nav-link nav-link-tech" onclick="toggleDropdown(event, 'tech-dropdown')">
+                            💻 技术基础 <span class="dropdown-arrow">▼</span>
                         </a>
-                        <ul class="dropdown-menu" id="linux-dropdown">
-                            <li><a href="/topic/linux/linux-basics">Linux 基础</a></li>
-                            <li><a href="/topic/linux/linux-networking">Linux 网络配置</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a href="javascript:void(0)" class="nav-link" onclick="toggleDropdown(event, 'docker-dropdown')">
-                            Docker <span class="dropdown-arrow">▼</span>
-                        </a>
-                        <ul class="dropdown-menu" id="docker-dropdown">
-                            <li><a href="/topic/docker/docker-basics">Docker 基础</a></li>
-                            <li><a href="/topic/docker/docker-compose">Docker Compose</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a href="javascript:void(0)" class="nav-link" onclick="toggleDropdown(event, 'k8s-dropdown')">
-                            K8s <span class="dropdown-arrow">▼</span>
-                        </a>
-                        <ul class="dropdown-menu" id="k8s-dropdown">
-                            <li><a href="/topic/k8s/k8s-basics">Kubernetes 基础</a></li>
+                        <ul class="dropdown-menu dropdown-menu-wide" id="tech-dropdown">
+                            <li class="dropdown-section">
+                                <h4>🐧 操作系统</h4>
+                                <ul>
+                                    <li><a href="/topic/linux/linux-basics">🐧 Linux 基础</a><span class="desc">命令行与系统管理</span></li>
+                                    <li><a href="/topic/linux/linux-networking">🌐 Linux 网络配置</a><span class="desc">网络设置与故障排查</span></li>
+                                </ul>
+                            </li>
+                            <li class="dropdown-section">
+                                <h4>🐳 容器技术</h4>
+                                <ul>
+                                    <li><a href="/topic/docker/docker-basics">🐳 Docker 基础</a><span class="desc">容器化技术应用</span></li>
+                                    <li><a href="/topic/docker/docker-compose">🎼 Docker Compose</a><span class="desc">多容器编排管理</span></li>
+                                </ul>
+                            </li>
+                            <li class="dropdown-section">
+                                <h4>☸️ 容器编排</h4>
+                                <ul>
+                                    <li><a href="/topic/k8s/k8s-basics">☸️ Kubernetes 基础</a><span class="desc">容器编排平台</span></li>
+                                </ul>
+                            </li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
