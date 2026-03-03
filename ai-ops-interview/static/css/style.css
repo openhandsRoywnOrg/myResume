@@ -570,14 +570,16 @@ footer a {
 
 /* 特殊菜单项样式 */
 .nav-link-ai-app,
-.nav-link-ai-se {
+.nav-link-ai-se,
+.nav-link-maps {
     background: rgba(255, 255, 255, 0.15);
     border-radius: 8px;
     margin: 5px 0;
 }
 
 .nav-link-ai-app:hover,
-.nav-link-ai-se:hover {
+.nav-link-ai-se:hover,
+.nav-link-maps:hover {
     background: rgba(255, 255, 255, 0.25);
 }
 
@@ -910,5 +912,364 @@ footer a {
     .btn-back, .btn-next {
         text-align: center;
         width: 100%;
+    }
+}
+
+/* ========== 技术路线图样式 ========== */
+
+.roadmap-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 30px 0;
+    padding: 30px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+}
+
+.roadmap-phase {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.roadmap-phase:hover {
+    transform: scale(1.02);
+}
+
+.phase-header {
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.phase-1 { background: #ff6b6b; color: white; }
+.phase-2 { background: #4ecdc4; color: white; }
+.phase-3 { background: #45b7d1; color: white; }
+.phase-4 { background: #96ceb4; color: white; }
+.phase-5 { background: #ffeaa7; color: #333; }
+
+.phase-number {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.3);
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.phase-header h3 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.phase-content ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.phase-content li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.phase-content li:last-child {
+    border-bottom: none;
+}
+
+.phase-duration {
+    margin-top: 15px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    text-align: center;
+    font-weight: 600;
+    color: #667eea;
+}
+
+.roadmap-arrow {
+    font-size: 30px;
+    color: white;
+    margin: 10px 0;
+    font-weight: bold;
+}
+
+.roadmap-detail {
+    margin: 30px 0;
+    padding: 25px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border-left: 4px solid #667eea;
+}
+
+.roadmap-detail h3 {
+    color: #667eea;
+    margin-bottom: 15px;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.detail-card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.detail-card h4 {
+    color: #667eea;
+    margin-bottom: 10px;
+}
+
+.resources {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.resources strong {
+    color: #667eea;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.resources ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.tips-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin: 30px 0;
+}
+
+.tip-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 25px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.tip-card h3 {
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+/* ========== AI DevOps 全景图样式 ========== */
+
+.landscape-overview {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    border-left: 4px solid #667eea;
+}
+
+.landscape-diagram {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 40px 0;
+}
+
+.landscape-layer {
+    background: white;
+    border: 2px solid #667eea;
+    border-radius: 10px;
+    padding: 20px;
+    width: 100%;
+    max-width: 800px;
+    margin-bottom: 10px;
+}
+
+.landscape-layer h3 {
+    color: #667eea;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.layer-components {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+}
+
+.component {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px;
+    border-radius: 6px;
+    text-align: center;
+    font-weight: 500;
+    transition: transform 0.3s ease;
+}
+
+.component:hover {
+    transform: translateY(-3px);
+}
+
+.landscape-arrow {
+    font-size: 24px;
+    color: #667eea;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.tech-stack-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin: 30px 0;
+}
+
+.stack-category {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-top: 3px solid #667eea;
+}
+
+.stack-category h3 {
+    color: #667eea;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+.stack-category ul {
+    list-style: none;
+    padding: 0;
+}
+
+.stack-category li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.stack-category li:last-child {
+    border-bottom: none;
+}
+
+.implementation-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin: 30px 0;
+}
+
+.impl-step {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.step-badge {
+    position: absolute;
+    top: -10px;
+    right: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.impl-step h3 {
+    color: #667eea;
+    margin-bottom: 10px;
+}
+
+.impl-step ul {
+    margin-top: 15px;
+    padding-left: 20px;
+}
+
+.impl-step li {
+    margin: 8px 0;
+}
+
+.best-practices {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin: 30px 0;
+}
+
+.practice-card {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+}
+
+.practice-card h3 {
+    color: #667eea;
+    margin-bottom: 10px;
+}
+
+.challenges-list {
+    margin: 30px 0;
+}
+
+.challenge-item {
+    background: white;
+    padding: 20px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.challenge-item h4 {
+    color: #ff6b6b;
+    margin-bottom: 10px;
+}
+
+.challenge-item p {
+    margin: 8px 0;
+    color: #666;
+}
+
+.challenge-item p strong {
+    color: #667eea;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    .roadmap-container {
+        padding: 15px;
+    }
+    
+    .roadmap-phase {
+        padding: 15px;
+    }
+    
+    .landscape-layer {
+        padding: 15px;
+    }
+    
+    .layer-components {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .tech-stack-grid,
+    .implementation-steps,
+    .best-practices {
+        grid-template-columns: 1fr;
     }
 }

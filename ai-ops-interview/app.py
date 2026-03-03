@@ -227,6 +227,42 @@ def ai_se_continuous_learning():
                          subtitle='知识更新与迭代',
                          content='<p>持续学习相关内容正在建设中...</p>')
 
+# ========== 知识地图相关路由 ==========
+
+@app.route('/maps/tech-roadmap')
+def maps_tech_roadmap():
+    """技术路线页面"""
+    return render_template('tech_roadmap.html')
+
+@app.route('/maps/ai-devops-landscape')
+def maps_ai_devops_landscape():
+    """AI DevOps 全景图页面"""
+    return render_template('ai_devops_landscape.html')
+
+@app.route('/maps/skill-matrix')
+def maps_skill_matrix():
+    """技能矩阵页面"""
+    return render_template('content_page.html',
+                         title='📐 技能矩阵',
+                         subtitle='能力评估与提升',
+                         content='<p>技能矩阵相关内容正在建设中...</p>')
+
+@app.route('/maps/career-path')
+def maps_career_path():
+    """职业发展页面"""
+    return render_template('content_page.html',
+                         title='💼 职业发展',
+                         subtitle='职业路径规划',
+                         content='<p>职业发展相关内容正在建设中...</p>')
+
+@app.route('/maps/certification')
+def maps_certification():
+    """认证指南页面"""
+    return render_template('content_page.html',
+                         title='📜 认证指南',
+                         subtitle='行业认证准备',
+                         content='<p>认证指南相关内容正在建设中...</p>')
+
 if __name__ == '__main__':
     from flask import request
     app.run(host='0.0.0.0', port=51880, debug=False, threaded=True)
