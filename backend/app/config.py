@@ -44,6 +44,7 @@ class BaseConfig:
     
     # 数据库连接 URL
     # 格式：postgresql://user:password@host:port/database
+    # 测试环境使用 SQLite，生产使用 PostgreSQL
     SQLALCHEMY_DATABASE_URI: str = os.environ.get(
         'DATABASE_URL',
         'postgresql://localhost:5432/ai_interview_dev'
@@ -52,7 +53,7 @@ class BaseConfig:
     # 跟踪对象修改（设为 False 节省内存）
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
     
-    # 池配置
+    # 池配置（仅适用于 PostgreSQL 等，SQLite 会忽略）
     SQLALCHEMY_ENGINE_OPTIONS: dict = {
         'pool_size': 10,
         'pool_recycle': 3600,
@@ -169,11 +170,17 @@ class TestingConfig(BaseConfig):
     DEBUG: bool = True
     TESTING: bool = True
     
-    # 测试数据库（每次测试前清空）
+    # 测试数据库（使用 SQLite 内存数据库，无需 PostgreSQL）
     SQLALCHEMY_DATABASE_URI: str = os.environ.get(
         'TEST_DATABASE_URL',
-        'postgresql://localhost:5432/ai_interview_test'
+        os.environ.get('SQLALCHEMY_DATABASE_URI', 'sqlite:///:memory:')
     )
+    
+    # 跟踪对象修改（设为 False 节省内存）
+    SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
+    
+    # SQLite 不需要池配置
+    SQLALCHEMY_ENGINE_OPTIONS: dict = {}
     
     # 测试环境使用内存缓存
     CACHE_TYPE: str = 'memory'

@@ -133,6 +133,100 @@ def api_search():
                         })
     return jsonify(results)
 
+# ========== AI 应用开发相关路由 ==========
+
+@app.route('/ai-apps/langchain')
+def ai_apps_langchain():
+    """LangChain 页面"""
+    return render_template('langchain.html')
+
+@app.route('/ai-apps/langgraph')
+def ai_apps_langgraph():
+    """LangGraph 页面"""
+    return render_template('content_page.html', 
+                         title='🕸️ LangGraph',
+                         subtitle='构建状态化 Agent 工作流',
+                         content='<p>LangGraph 相关内容正在建设中...</p>')
+
+@app.route('/ai-apps/mcp')
+def ai_apps_mcp():
+    """MCP 页面"""
+    return render_template('content_page.html',
+                         title='🔌 MCP (Model Context Protocol)',
+                         subtitle='模型上下文协议',
+                         content='<p>MCP 相关内容正在建设中...</p>')
+
+@app.route('/ai-apps/agent-collaboration')
+def ai_apps_agent_collaboration():
+    """多 Agent 协同页面"""
+    return render_template('content_page.html',
+                         title='👥 多 Agent 协同',
+                         subtitle='Agent 间协作与通信',
+                         content='<p>多 Agent 协同相关内容正在建设中...</p>')
+
+@app.route('/ai-apps/agent-orchestration')
+def ai_apps_agent_orchestration():
+    """Agent 编排页面"""
+    return render_template('content_page.html',
+                         title='🎼 Agent 编排',
+                         subtitle='复杂任务调度与管理',
+                         content='<p>Agent 编排相关内容正在建设中...</p>')
+
+@app.route('/ai-apps/agent-evaluation')
+def ai_apps_agent_evaluation():
+    """Agent 评估页面"""
+    return render_template('content_page.html',
+                         title='📊 Agent 评估',
+                         subtitle='性能与效果评估',
+                         content='<p>Agent 评估相关内容正在建设中...</p>')
+
+# ========== AI 软件工程相关路由 ==========
+
+@app.route('/ai-se/doc-driven')
+def ai_se_doc_driven():
+    """文档驱动开发页面"""
+    return render_template('doc_driven.html')
+
+@app.route('/ai-se/test-driven')
+def ai_se_test_driven():
+    """测试驱动开发页面"""
+    return render_template('content_page.html',
+                         title='✅ 测试驱动开发 (TDD)',
+                         subtitle='Test-Driven Development',
+                         content='<p>测试驱动开发相关内容正在建设中...</p>')
+
+@app.route('/ai-se/requirement-driven')
+def ai_se_requirement_driven():
+    """需求驱动开发页面"""
+    return render_template('content_page.html',
+                         title='🎯 需求驱动开发',
+                         subtitle='Requirement-Driven Development',
+                         content='<p>需求驱动开发相关内容正在建设中...</p>')
+
+@app.route('/ai-se/ai-workflow')
+def ai_se_ai_workflow():
+    """AI 工程流程页面"""
+    return render_template('content_page.html',
+                         title='⚙️ AI 工程流程',
+                         subtitle='完整开发工作流',
+                         content='<p>AI 工程流程相关内容正在建设中...</p>')
+
+@app.route('/ai-se/code-review')
+def ai_se_code_review():
+    """AI 代码审查页面"""
+    return render_template('content_page.html',
+                         title='🔍 AI 代码审查',
+                         subtitle='自动化 Code Review',
+                         content='<p>AI 代码审查相关内容正在建设中...</p>')
+
+@app.route('/ai-se/continuous-learning')
+def ai_se_continuous_learning():
+    """持续学习页面"""
+    return render_template('content_page.html',
+                         title='📚 持续学习',
+                         subtitle='知识更新与迭代',
+                         content='<p>持续学习相关内容正在建设中...</p>')
+
 if __name__ == '__main__':
     from flask import request
     app.run(host='0.0.0.0', port=51880, debug=False, threaded=True)

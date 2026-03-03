@@ -1,0 +1,134 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LangChain - AI 应用开发</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 导航栏（简化版，实际应该包含完整导航） -->
+        <nav class="navbar">
+            <div class="nav-container">
+                <ul class="nav-menu">
+                    <li class="nav-item"><a href="/" class="nav-link">🏠 首页</a></li>
+                    <li class="nav-item"><a href="/ai-apps/langchain" class="nav-link active">🦜 LangChain</a></li>
+                    <li class="nav-item"><a href="/ai-apps/langgraph" class="nav-link">🕸️ LangGraph</a></li>
+                    <li class="nav-item"><a href="/ai-apps/mcp" class="nav-link">🔌 MCP</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <main class="content-page">
+            <div class="page-header">
+                <h1>🦜 LangChain</h1>
+                <p class="subtitle">LLM 应用开发框架</p>
+            </div>
+
+            <div class="content-body">
+                <section class="topic-section">
+                    <h2>📖 什么是 LangChain？</h2>
+                    <p>LangChain 是一个用于开发由语言模型驱动的应用程序的框架。它提供了模块化的抽象和工具，使开发者能够轻松构建复杂的 LLM 应用。</p>
+                </section>
+
+                <section class="topic-section">
+                    <h2>🎯 核心特性</h2>
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <h3>🔗 链式调用</h3>
+                            <p>将多个 LLM 调用组合成链式工作流，实现复杂的业务逻辑。</p>
+                        </div>
+                        <div class="feature-card">
+                            <h3>🧠 记忆管理</h3>
+                            <p>内置多种记忆机制，支持对话历史管理和上下文追踪。</p>
+                        </div>
+                        <div class="feature-card">
+                            <h3>🔌 工具集成</h3>
+                            <p>丰富的工具库，可轻松集成外部 API、数据库和文件系统。</p>
+                        </div>
+                        <div class="feature-card">
+                            <h3>📚 文档加载</h3>
+                            <p>支持多种文档格式，自动分割和向量化处理。</p>
+                        </div>
+                        <div class="feature-card">
+                            <h3>🤖 Agent 支持</h3>
+                            <p>构建智能 Agent，实现自主决策和工具使用能力。</p>
+                        </div>
+                        <div class="feature-card">
+                            <h3>📊 评估框架</h3>
+                            <p>内置评估工具，量化 LLM 应用的性能和质量。</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="topic-section">
+                    <h2>💻 快速开始</h2>
+                    <div class="code-block">
+                        <pre><code># 安装 LangChain
+pip install langchain
+
+# 基础示例
+from langchain.llms import OpenAI
+from langchain.chains import LLMChain
+from langchain.prompts import PromptTemplate
+
+# 初始化 LLM
+llm = OpenAI(temperature=0.7)
+
+# 创建提示模板
+prompt = PromptTemplate(
+    input_variables=["topic"],
+    template="请详细解释一下{topic}的核心概念。"
+)
+
+# 创建链
+chain = LLMChain(llm=llm, prompt=prompt)
+
+# 执行
+result = chain.run("机器学习")
+print(result)</code></pre>
+                    </div>
+                </section>
+
+                <section class="topic-section">
+                    <h2>📚 学习资源</h2>
+                    <ul class="resource-list">
+                        <li><a href="https://python.langchain.com/" target="_blank">📖 官方文档</a></li>
+                        <li><a href="https://github.com/langchain-ai/langchain" target="_blank">💻 GitHub 仓库</a></li>
+                        <li><a href="https://blog.langchain.dev/" target="_blank">📝 官方博客</a></li>
+                    </ul>
+                </section>
+
+                <section class="topic-section">
+                    <h2>❓ 面试问题</h2>
+                    <div class="question-list">
+                        <div class="question-item">
+                            <h4>1. LangChain 的主要组件有哪些？</h4>
+                            <p><strong>参考答案：</strong>LangChain 的核心组件包括：Models（模型）、Prompts（提示）、Chains（链）、Agents（Agent）、Memory（记忆）、Tools（工具）等。</p>
+                        </div>
+                        <div class="question-item">
+                            <h4>2. 如何使用 LangChain 实现 RAG（检索增强生成）？</h4>
+                            <p><strong>参考答案：</strong>使用 LangChain 实现 RAG 需要：1) 加载文档（Document Loaders）2) 分割文本（Text Splitters）3) 创建向量存储（Vector Stores）4) 构建检索链（Retrieval Chains）5) 结合 LLM 生成答案。</p>
+                        </div>
+                        <div class="question-item">
+                            <h4>3. LangChain 中的 Agent 是如何工作的？</h4>
+                            <p><strong>参考答案：</strong>Agent 使用 LLM 来决定采取什么行动以及行动的顺序。它可以根据用户输入自主选择使用哪些工具，并解释结果。</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="back-link">
+                <a href="/" class="btn-back">← 返回首页</a>
+                <a href="/ai-apps/langgraph" class="btn-next">下一个：LangGraph →</a>
+            </div>
+        </main>
+
+        <footer>
+            <p>AI 运维开发面试知识总结</p>
+        </footer>
+    </div>
+</body>
+</html>
