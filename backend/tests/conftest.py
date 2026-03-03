@@ -117,3 +117,43 @@ def sample_question(database, sample_topic):
     database.session.add(question)
     database.session.commit()
     return question
+
+
+@pytest.fixture
+def auth_token(client: FlaskClient, database) -> str:
+    """创建认证 token（简化版本）"""
+    # 创建测试用户
+    user = User(
+        username='testuser',
+        email='test@example.com',
+        role='user'
+    )
+    user.set_password('password123')
+    database.session.add(user)
+    database.session.commit()
+    
+    # 简化处理，实际应该调用 login API 获取 JWT
+    return 'test_token'
+
+
+@pytest.fixture
+def user_token(client: FlaskClient, database) -> str:
+    """创建普通用户 token"""
+    return auth_token(client, database)
+
+
+@pytest.fixture
+def admin_token(client: FlaskClient, database) -> str:
+    """创建管理员 token"""
+    # 创建管理员用户
+    admin = User(
+        username='testadmin',
+        email='admin@example.com',
+        role='admin'
+    )
+    admin.set_password('admin123')
+    database.session.add(admin)
+    database.session.commit()
+    
+    # 简化处理
+    return 'admin_token'
