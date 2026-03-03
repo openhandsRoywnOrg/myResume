@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI DevOps 知识库 - 个人简历与技术栈</title>
+    <link rel="stylesheet" href="/static/css/style-new.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar-new">
+        <div class="nav-brand">
+            <span class="logo">🚀</span>
+            <span class="title">AI DevOps 知识库</span>
+        </div>
+        
+        <div class="nav-search">
+            <input type="text" placeholder="搜索知识点...">
+            <button class="search-btn">🔍</button>
+        </div>
+        
+        <ul class="nav-menu">
+            <li class="nav-item dropdown">
+                <a href="javascript:void(0)" class="nav-link nav-link-tech">
+                    💻 技术基础 <span class="dropdown-arrow">▼</span>
+                </a>
+            </li>
+            <li class="nav-item dropdown">
+                <a href="javascript:void(0)" class="nav-link nav-link-ai-app">
+                    🤖 AI 应用开发 <span class="dropdown-arrow">▼</span>
+                </a>
+            </li>
+            <li class="nav-item dropdown">
+                <a href="javascript:void(0)" class="nav-link nav-link-ai-se">
+                    📐 AI 软件工程 <span class="dropdown-arrow">▼</span>
+                </a>
+            </li>
+            <li class="nav-item dropdown">
+                <a href="javascript:void(0)" class="nav-link nav-link-maps">
+                    🗺️ 知识地图 <span class="dropdown-arrow">▼</span>
+                </a>
+            </li>
+        </ul>
+        
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+        <!-- 个人简介 -->
+        <section class="hero-section">
+            <div class="hero-content">
+                <h1 class="hero-title">你好，我是 <span class="highlight">开发者</span></h1>
+                <p class="hero-subtitle">AI DevOps 工程师 | 持续学习者 | 技术探索者</p>
+                <div class="hero-actions">
+                    <a href="/resume" class="btn btn-primary">📄 查看简历</a>
+                    <a href="/contact" class="btn btn-secondary">📧 联系我</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 技术栈 -->
+        <section class="tech-stack-section">
+            <h2 class="section-title">🛠️ 技术栈</h2>
+            <div class="tech-grid">
+                <div class="tech-card">
+                    <div class="tech-icon">💻</div>
+                    <div class="tech-name">Linux</div>
+                    <div class="tech-level">
+                        <div class="stars">★★★★☆</div>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: 80%"></div>
+                        </div>
+                        <span class="percentage">80%</span>
+                    </div>
+                </div>
+                
+                <div class="tech-card">
+                    <div class="tech-icon">🐳</div>
+                    <div class="tech-name">Docker</div>
+                    <div class="tech-level">
+                        <div class="stars">★★★★☆</div>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: 75%"></div>
+                        </div>
+                        <span class="percentage">75%</span>
+                    </div>
+                </div>
+                
+                <div class="tech-card">
+                    <div class="tech-icon">☸️</div>
+                    <div class="tech-name">Kubernetes</div>
+                    <div class="tech-level">
+                        <div class="stars">★★★☆☆</div>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: 60%"></div>
+                        </div>
+                        <span class="percentage">60%</span>
+                    </div>
+                </div>
+                
+                <div class="tech-card">
+                    <div class="tech-icon">🤖</div>
+                    <div class="tech-name">AI/ML</div>
+                    <div class="tech-level">
+                        <div class="stars">★★☆☆☆</div>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: 40%"></div>
+                        </div>
+                        <span class="percentage">40%</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 学习进度 -->
+        <section class="progress-section">
+            <h2 class="section-title">📈 学习进度</h2>
+            <div class="progress-container">
+                <div class="progress-summary">
+                    <div class="total-progress">
+                        <span class="label">总进度</span>
+                        <div class="progress-bar-large">
+                            <div class="progress" style="width: 65%"></div>
+                        </div>
+                        <span class="percentage-large">65%</span>
+                    </div>
+                </div>
+                
+                <div class="stage-progress">
+                    <div class="progress-card completed">
+                        <div class="progress-header">
+                            <h4>阶段 1: 基础入门</h4>
+                            <span class="status">✅ 完成</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: 100%"></div>
+                        </div>
+                        <div class="progress-topics">
+                            <span class="topic">Linux</span>
+                            <span class="topic">Docker</span>
+                            <span class="topic">Git</span>
+                            <span class="topic">Python</span>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-card current">
+                        <div class="progress-header">
+                            <h4>阶段 2: 运维开发核心</h4>
+                            <span class="status">🔄 进行中</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: 60%"></div>
+                        </div>
+                        <div class="progress-topics">
+                            <span class="topic">K8s</span>
+                            <span class="topic">CI/CD</span>
+                            <span class="topic">Monitoring</span>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-card">
+                        <div class="progress-header">
+                            <h4>阶段 3: AI/ML 基础</h4>
+                            <span class="status">⏳ 未开始</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: 0%"></div>
+                        </div>
+                        <div class="progress-topics">
+                            <span class="topic">机器学习</span>
+                            <span class="topic">深度学习</span>
+                            <span class="topic">LLM</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 最近学习 -->
+        <section class="recent-section">
+            <h2 class="section-title">📚 最近学习</h2>
+            <div class="recent-grid">
+                <div class="recent-card">
+                    <div class="recent-icon">🐳</div>
+                    <div class="recent-content">
+                        <h3>Docker Compose</h3>
+                        <p>多容器编排管理</p>
+                        <span class="recent-date">2025-03-02</span>
+                    </div>
+                </div>
+                
+                <div class="recent-card">
+                    <div class="recent-icon">☸️</div>
+                    <div class="recent-content">
+                        <h3>Kubernetes 基础</h3>
+                        <p>容器编排平台</p>
+                        <span class="recent-date">2025-03-01</span>
+                    </div>
+                </div>
+                
+                <div class="recent-card">
+                    <div class="recent-icon">🦜</div>
+                    <div class="recent-content">
+                        <h3>LangChain</h3>
+                        <p>LLM 应用开发框架</p>
+                        <span class="recent-date">2025-02-28</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer-new">
+        <p>AI 运维开发面试知识总结 | 参照 <a href="https://www.mianshiya.com/" target="_blank">面试导航</a> 风格</p>
+        <p>© 2025 AI DevOps 知识库</p>
+    </footer>
+
+    <script>
+        // 主题切换
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', newTheme);
+            
+            const btn = document.querySelector('.theme-toggle');
+            btn.textContent = newTheme === 'light' ? '🌙' : '☀️';
+            
+            localStorage.setItem('theme', newTheme);
+        }
+
+        // 加载保存的主题
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.querySelector('.theme-toggle').textContent = savedTheme === 'light' ? '🌙' : '☀️';
+        });
+    </script>
+</body>
+</html>
