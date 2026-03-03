@@ -1,0 +1,97 @@
+{% extends "base-pro.html" %}
+
+{% block title %}{{ title }} - AI DevOps Pro{% endblock %}
+
+{% block content %}
+<section class="hero-section-pro">
+    <h1 class="hero-title">{{ title }}</h1>
+    <p class="hero-tagline">{{ subtitle }}</p>
+</section>
+
+<section class="content-section">
+    <div class="content-card">
+        <h2>Welcome to AI DevOps Pro Style</h2>
+        <p>This page demonstrates the new AI DevOps Pro design system.</p>
+        
+        <div class="features-grid">
+            <div class="feature-item">
+                <div class="feature-icon">🎨</div>
+                <h3>Modern Design</h3>
+                <p>Clean and professional UI inspired by Code Wiki</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">🌙</div>
+                <h3>Dark Mode</h3>
+                <p>Toggle between light and dark themes</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">📱</div>
+                <h3>Responsive</h3>
+                <p>Works perfectly on all devices</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.content-section {
+    margin-bottom: 3rem;
+}
+
+.content-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px var(--card-shadow);
+}
+
+.content-card h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.content-card p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 2rem;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.feature-item {
+    text-align: center;
+    padding: 1.5rem;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+}
+
+.feature-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.feature-item h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.feature-item p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 0;
+}
+</style>
+{% endblock %}

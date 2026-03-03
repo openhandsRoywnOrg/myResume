@@ -270,3 +270,12 @@ def maps_certification():
 if __name__ == '__main__':
     from flask import request
     app.run(host='0.0.0.0', port=51880, debug=False, threaded=True)
+
+# ========== AI DevOps Pro 风格页面示例 ==========
+
+@app.route('/pro/example')
+def pro_example():
+    """使用新 UI 风格的示例页面"""
+    return render_template('example-pro.html',
+                         title='Example Page',
+                         subtitle='AI DevOps Pro Style')
