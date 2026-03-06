@@ -23,6 +23,10 @@ def app():
 def database(app):
     """为每个测试创建干净的数据"""
     with app.app_context():
+        # 清理所有现有数据（SQLite 内存数据库）
+        db.session.query(User).delete()
+        db.session.commit()
+        
         # 开始事务
         db.session.begin_nested()
         yield db
