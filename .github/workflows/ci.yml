@@ -68,6 +68,7 @@ jobs:
       - name: Run tests with pytest
         working-directory: ./backend
         env:
+          PYTHONPATH: ${{ github.workspace }}/backend
           DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
           SECRET_KEY: test-secret-key-for-ci
           DEBUG: true
