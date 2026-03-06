@@ -8,6 +8,7 @@ SQLAlchemy==2.0.23
 psycopg2-binary==2.9.9
 
 # 认证
+Flask-JWT-Extended==4.6.0
 PyJWT==2.8.0
 bcrypt==4.1.2
 
