@@ -24,7 +24,8 @@ pip install openhands-ai
 ### 2. 配置环境变量
 
 ```bash
-# ⚠️ 必须修改：设置你的 Webhook Secret
+# 🔐 必须设置：生成强密码 Secret
+openssl rand -hex 32
 export WEBHOOK_SECRET="your-secret-here"
 
 # 可选：如果需要覆盖 LLM 配置
@@ -34,6 +35,7 @@ export LLM_BASE_URL="https://coding.dashscope.aliyuncs.com/v1"
 ```
 
 **⚠️ 重要安全提示**：
+- `WEBHOOK_SECRET` **必须设置**，否则服务无法启动
 - `WEBHOOK_SECRET` 必须与 GitHub Workflow 中的 `secrets.OPENHANDS_WEBHOOK_SECRET` 一致
 - 使用强密码（至少 32 位随机字符）
 - 不要将 secret 提交到版本控制系统
