@@ -51,7 +51,7 @@ chmod +x deploy-webhook-v2.sh
 
 ```bash
 # 健康检查
-curl http://localhost:5001/health
+curl http://127.0.0.1:5001/health
 
 # 查看日志
 docker logs -f openhands-webhook-server
@@ -70,11 +70,11 @@ docker rm openhands-webhook-server 2>/dev/null || true
 sudo mkdir -p /app/logs
 sudo chmod 777 /app/logs
 
-# 3. 启动容器
+# 3. 启动容器（使用宿主机网络）
 docker run -d \
   --name openhands-webhook-server \
   --restart unless-stopped \
-  -p 5001:5001 \
+  --network host \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v /app/logs:/app/logs \
   -v $(pwd)/webhook_server_v2.0.py:/app/webhook_server.py:ro \
@@ -84,7 +84,7 @@ docker run -d \
   python /app/webhook_server.py
 
 # 4. 验证
-curl http://localhost:5001/health
+curl http://127.0.0.1:5001/health
 ```
 
 ## 🧪 测试
@@ -108,7 +108,45 @@ curl -X POST "https://api.github.com/repos/YOUR_ORG/YOUR_REPO/issues" \
 docker logs -f openhands-webhook-server
 
 # 或 HTTP 接口
-curl http://localhost:5001/logs
+curl http://127.0.0.1:5001/logs
+```
+
+## 🌐 网络模式说明
+
+### 宿主机网络模式 (Host Network)
+
+本部署使用 **宿主机网络模式** (`--network host`)，优势包括：
+
+**优势**：
+- ✅ 无需端口映射，直接使用宿主机端口
+- ✅ 网络性能更好，无 NAT 开销
+- ✅ 简化网络配置，避免端口冲突
+- ✅ 容器可以直接访问宿主机网络接口
+
+**注意**：
+- ⚠️ 容器会占用宿主机的 5001 端口
+- ⚠️ 仅支持 Linux 系统（Windows/Mac 不支持）
+- ⚠️ 确保 5001 端口未被其他服务占用
+
+**防火墙配置**（如需要）：
+```bash
+# 允许 5001 端口访问
+sudo ufw allow 5001/tcp
+
+# 或限制特定 IP 访问
+sudo ufw allow from 140.82.112.0/20 to any port 5001 proto tcp
+```
+
+### 端口映射模式（可选）
+
+如果需要使用端口映射（例如在 Windows/Mac 上）：
+
+```bash
+docker run -d \
+  --name openhands-webhook-server \
+  --restart unless-stopped \
+  -p 5001:5001 \
+  ...
 ```
 
 ## 📝 配置 GitHub Workflow
