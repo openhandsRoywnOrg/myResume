@@ -231,19 +231,23 @@ def parse_openhands_json_output(output_file: str, issue_number: int) -> str:
     
     根据官方文档：https://docs.openhands.dev/sdk/arch/events
     JSONL 输出包含多种事件类型，需要正确处理
+    
+    调试模式：保留完整的原始 JSON 输出到日志
     """
     try:
         actions = []
         thoughts = []
         conversation = []
+        raw_events = []  # 保存所有原始事件用于调试
         
         with open(output_file, 'r', encoding='utf-8') as f:
-            for line in f:
+            for line_num, line in enumerate(f, 1):
                 line = line.strip()
-                # 跳过空行和装饰性文本
+                # 跳过空行
                 if not line:
                     continue
                 
+                # 跳过装饰性文本
                 skip_patterns = [
                     'OpenHands CLI', 'Initializing', 'Agent is', 
                     'Agent finished', '─', '✓', 'To override', 
@@ -256,8 +260,12 @@ def parse_openhands_json_output(output_file: str, issue_number: int) -> str:
                     # 解析 JSON
                     event = json.loads(line)
                     
-                    # 确保 event 是字典（某些行可能是字符串或其他类型）
+                    # 保存原始事件（前 500 字符）用于调试
+                    raw_events.append(f"Line {line_num}: {line[:500]}")
+                    
+                    # 确保 event 是字典
                     if not isinstance(event, dict):
+                        logger.debug(f"Issue #{issue_number} - Line {line_num}: 非字典类型 - {type(event)}")
                         continue
                     
                     kind = event.get('kind', '')
@@ -271,6 +279,8 @@ def parse_openhands_json_output(output_file: str, issue_number: int) -> str:
                         summary = event.get('summary', '') or ''
                         reasoning = event.get('reasoning_content', '') or ''
                         thought = event.get('thought', '') or ''
+                        
+                        logger.debug(f"Issue #{issue_number} - ActionEvent: tool={tool_name}, summary={summary[:50] if summary else 'None'}")
                         
                         # 构建工具调用信息
                         if tool_name:
@@ -292,6 +302,7 @@ def parse_openhands_json_output(output_file: str, issue_number: int) -> str:
                         
                         # 确保 llm_message 是字典
                         if not isinstance(llm_message, dict):
+                            logger.debug(f"Issue #{issue_number} - Line {line_num}: llm_message 非字典类型 - {type(llm_message)}")
                             continue
                         
                         content = llm_message.get('content', [])
@@ -305,6 +316,7 @@ def parse_openhands_json_output(output_file: str, issue_number: int) -> str:
                             
                             if text:
                                 emoji = "🤖" if source == 'agent' else "👤"
+                                logger.debug(f"Issue #{issue_number} - MessageEvent: source={source}, text={text[:50]}")
                                 conversation.append(f"{emoji} {text}")
                     
                     elif kind == 'ObservationEvent':
@@ -312,6 +324,7 @@ def parse_openhands_json_output(output_file: str, issue_number: int) -> str:
                         observation = event.get('observation', {})
                         
                         if not isinstance(observation, dict):
+                            logger.debug(f"Issue #{issue_number} - Line {line_num}: observation 非字典类型 - {type(observation)}")
                             continue
                         
                         content = observation.get('content', [])
@@ -321,6 +334,7 @@ def parse_openhands_json_output(output_file: str, issue_number: int) -> str:
                                 if isinstance(item, dict) and item.get('type') == 'text':
                                     obs = item.get('text', '')[:150]
                                     if obs:
+                                        logger.debug(f"Issue #{issue_number} - ObservationEvent: {obs[:50]}")
                                         actions.append(f"👁️ {obs}")
                                     break
                     
@@ -328,14 +342,23 @@ def parse_openhands_json_output(output_file: str, issue_number: int) -> str:
                         # AgentErrorEvent: Agent 错误
                         error_msg = event.get('message', '') or event.get('error', '')
                         if error_msg:
+                            logger.debug(f"Issue #{issue_number} - AgentErrorEvent: {error_msg[:100]}")
                             actions.append(f"❌ 错误：{error_msg[:150]}")
                     
-                except json.JSONDecodeError:
+                    else:
+                        # 其他事件类型
+                        if kind:
+                            logger.debug(f"Issue #{issue_number} - 未知事件类型：{kind}")
+                    
+                except json.JSONDecodeError as e:
                     # 非 JSON 行，跳过
+                    logger.debug(f"Issue #{issue_number} - Line {line_num}: JSON 解析失败 - {e}")
+                    logger.debug(f"Issue #{issue_number} - Line {line_num}: 原始内容 - {line[:200]}")
                     continue
                 except (AttributeError, TypeError, KeyError) as e:
                     # 数据结构不符合预期，跳过
-                    logger.debug(f"解析事件时出错：{e}")
+                    logger.debug(f"Issue #{issue_number} - Line {line_num}: 数据结构错误 - {e}")
+                    logger.debug(f"Issue #{issue_number} - Line {line_num}: 原始内容 - {line[:200]}")
                     continue
         
         # 构建摘要
@@ -362,13 +385,22 @@ def parse_openhands_json_output(output_file: str, issue_number: int) -> str:
                 summary_parts.append(f"  {i}. {msg}")
         
         if not summary_parts:
-            return "OpenHands 已执行完成（无详细输出）"
+            # 如果没有提取到内容，输出原始 JSON 的前几行用于调试
+            if raw_events:
+                logger.warning(f"Issue #{issue_number} - 未提取到有效事件，原始 JSON 前 5 行:")
+                for i, raw in enumerate(raw_events[:5], 1):
+                    logger.warning(f"  {i}. {raw}")
+                return f"OpenHands 已执行，解析到 {len(raw_events)} 个事件（但未识别类型）。请查看日志获取原始 JSON。"
+            else:
+                return "OpenHands 已执行完成（无详细输出）"
         
         # 使用 chr(10) 避免 f-string 语法错误
         return chr(10).join(summary_parts)
         
     except Exception as e:
-        logger.error(f"解析 JSON 输出失败：{e}")
+        logger.error(f"Issue #{issue_number} - 解析 JSON 输出失败：{e}")
+        import traceback
+        logger.error(f"Issue #{issue_number} - 堆栈跟踪：{traceback.format_exc()}")
         return f"OpenHands 已执行，但解析输出失败：{str(e)}"
 
 
