@@ -411,7 +411,7 @@ def should_trigger_issue_event(data: dict) -> bool:
     action = data.get('action', '')
     
     # 支持 opened 和 labeled 两种情况
-    if action not in ['opened', 'labeled']:
+    if action not in ['opened', 'reopened', 'labeled']:
         return False
     
     labels = [l['name'] for l in data['issue'].get('labels', [])]
@@ -421,7 +421,7 @@ def should_trigger_issue_event(data: dict) -> bool:
 def should_trigger_pr_event(data: dict) -> bool:
     """检查 PR 事件是否应该触发"""
     action = data.get('action', '')
-    if action not in ['opened', 'labeled']:
+    if action not in ['opened', 'reopened', 'labeled']:
         return False
     
     labels = [l['name'] for l in data['pull_request'].get('labels', [])]
@@ -507,12 +507,14 @@ def webhook():
     if event == 'issues':
         if should_trigger_issue_event(data):
             should_trigger = True
-            event_type = 'issues.labeled'
+            action = data.get('action', 'unknown')
+            event_type = f'issues.{action}'
     
     elif event == 'pull_request':
         if should_trigger_pr_event(data):
             should_trigger = True
-            event_type = 'pull_request.labeled'
+            action = data.get('action', 'unknown')
+            event_type = f'pull_request.{action}'
     
     elif event == 'issue_comment':
         if should_trigger_comment_event(data):
