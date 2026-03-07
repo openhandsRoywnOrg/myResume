@@ -29,7 +29,10 @@ from typing import Optional
 app = Flask(__name__)
 
 # ==================== 配置 ====================
-WEBHOOK_SECRET = os.environ.get('WEBHOOK_SECRET', '2d52d08e4ee7a0bdc559ea6274411da54df57ced')
+# ⚠️ 必须通过环境变量设置 WEBHOOK_SECRET，不提供默认值
+WEBHOOK_SECRET = os.environ.get('WEBHOOK_SECRET')
+if not WEBHOOK_SECRET:
+    raise ValueError("WEBHOOK_SECRET environment variable is required")
 
 # 日志配置
 log_file = '/app/logs/webhook.log'
