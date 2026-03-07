@@ -58,10 +58,11 @@ sudo chmod 777 /app/logs
 
 # 6. 启动新容器
 echo "🚀 启动新的 webhook 服务器..."
+echo "📡 使用宿主机网络模式 (host network)..."
 docker run -d \
     --name openhands-webhook-server \
     --restart unless-stopped \
-    -p 5001:5001 \
+    --network host \
     -v /var/run/docker.sock:/var/run/docker.sock \
     -v /app/logs:/app/logs \
     -v "$WEBHOOK_CODE:/app/webhook_server.py:ro" \
@@ -76,16 +77,17 @@ sleep 5
 
 # 8. 健康检查
 echo "🏥 执行健康检查..."
-if curl -f http://localhost:5001/health; then
+if curl -f http://127.0.0.1:5001/health; then
     echo ""
     echo "✅ Webhook 服务器启动成功！"
     echo ""
     echo "======================================"
     echo "服务信息："
-    echo "  - 端口：5001"
-    echo "  - 健康检查：http://localhost:5001/health"
-    echo "  - 日志查看：http://localhost:5001/logs"
+    echo "  - 端口：5001 (宿主机网络)"
+    echo "  - 健康检查：http://127.0.0.1:5001/health"
+    echo "  - 日志查看：http://127.0.0.1:5001/logs"
     echo "  - 模式：Headless (无 UI)"
+    echo "  - 网络：宿主机网络模式 (host)"
     echo "  - 版本：v2.0"
     echo "======================================"
     echo ""
