@@ -9,20 +9,21 @@ echo "Webhook 服务器部署 - v2.0"
 echo "Headless 模式 (基于官方文档)"
 echo "======================================"
 
-# 1. 检查 openhands 命令是否存在
+# 1. 检查 openhands 命令是否存在（可选，只在宿主机检查）
 echo "🔍 检查 OpenHands CLI 安装..."
-if ! command -v openhands &> /dev/null; then
-    echo "❌ 错误：openhands 命令未找到！"
-    echo ""
-    echo "请先安装 OpenHands CLI："
-    echo "   pip install openhands-ai"
-    echo "或者："
-    echo "   curl -sSL https://install.openhands.dev | bash"
-    exit 1
-fi
-
-echo "✅ OpenHands CLI 已安装：$(which openhands)"
-openhands --version 2>&1 | head -1 || true
+echo "⚠️  注意：OpenHands 将在容器内安装，宿主机无需安装"
+# if ! command -v openhands &> /dev/null; then
+#     echo "❌ 错误：openhands 命令未找到！"
+#     echo ""
+#     echo "请先安装 OpenHands CLI："
+#     echo "   pip install openhands-ai"
+#     echo "或者："
+#     echo "   curl -sSL https://install.openhands.dev | bash"
+#     exit 1
+# fi
+# 
+# echo "✅ OpenHands CLI 已安装：$(which openhands)"
+# openhands --version 2>&1 | head -1 || true
 
 # 2. 检查配置文件
 echo ""
