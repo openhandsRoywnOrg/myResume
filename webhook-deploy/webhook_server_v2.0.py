@@ -114,25 +114,78 @@ def trigger_openhands_headless(task_description: str, issue_number: int) -> tupl
     触发 OpenHands CLI (Headless 模式)
     
     根据官方文档，正确的命令格式：
-    openhands --headless --json -t "<task>" --exit-without-confirmation
+    openhands --headless -t "<task>" --exit-without-confirmation
+    
+    可选：--json 用于结构化输出
     
     Returns:
         (success, message)
     """
-    import tempfile
-    import os
-    
     try:
-        # 创建临时文件存储 JSON 输出
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.jsonl', delete=False) as f:
-            output_file = f.name
-        
-        # ✅ 正确的命令格式（基于官方文档，添加 --json 参数）
+        # ✅ 正确的命令格式（基于官方文档）
         # 注意：不需要传 LLM 和 GitHub token，这些在 ~/.openhands/ 中配置
         cmd = [
             'openhands',
             '--headless',
-            '--json',  # 添加 --json 参数用于结构化输出
+            '-t', task_description,
+            '--exit-without-confirmation'
+        ]
+        
+        # 可选：添加 --json 用于结构化输出（便于解析）
+        # cmd.append('--json')
+        
+        logger.info(f"触发 OpenHands Headless - Issue #{issue_number}")
+        logger.info(f"命令：openhands --headless -t \"Please fix GitHub issue #{issue_number}...\"")
+        
+        # 执行命令
+        # 注意：需要继承环境变量（LLM_API_KEY 等可能在环境中）
+        env = os.environ.copy()
+        
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=1800,  # 30 分钟超时
+            env=env
+        )
+        
+        if result.returncode == 0:
+            logger.info(f"OpenHands 处理成功 - Issue #{issue_number}")
+            # 记录输出（限制长度）
+            output = result.stdout[:1000] if result.stdout else "无输出"
+            logger.info(f"输出：{output}")
+            return True, f"成功处理 Issue #{issue_number}"
+        else:
+            logger.error(f"OpenHands 处理失败 - Issue #{issue_number}")
+            logger.error(f"STDOUT: {result.stdout[:500] if result.stdout else 'None'}")
+            logger.error(f"STDERR: {result.stderr[:500] if result.stderr else 'None'}")
+            return False, f"处理失败：{result.stderr[:500] if result.stderr else result.stdout[:500]}"
+            
+    except subprocess.TimeoutExpired:
+        logger.error(f"OpenHands 执行超时 - Issue #{issue_number}")
+        return False, "执行超时（30 分钟）"
+    except FileNotFoundError:
+        logger.error(f"openhands 命令未找到 - 请确保已安装 OpenHands CLI")
+        logger.error(f"安装方法：pip install openhands-ai")
+        return False, "openhands 命令未找到，请先安装 OpenHands CLI (pip install openhands-ai)"
+    except Exception as e:
+        logger.error(f"执行出错：{str(e)}")
+        return False, f"执行错误：{str(e)}"
+
+
+def trigger_openhands_headless(task_description: str, issue_number: int) -> tuple[bool, str]:
+    """触发 OpenHands CLI (Headless 模式)"""
+    import tempfile
+    import os
+    
+    try:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.jsonl', delete=False) as f:
+            output_file = f.name
+        
+        cmd = [
+            'openhands',
+            '--headless',
+            '--json',
             '-t', task_description,
             '--exit-without-confirmation'
         ]
@@ -141,24 +194,13 @@ def trigger_openhands_headless(task_description: str, issue_number: int) -> tupl
         logger.info(f"命令：openhands --headless --json -t \"...\"")
         logger.info(f"输出文件：{output_file}")
         
-        # 执行命令，重定向输出到文件
-        # 注意：需要继承环境变量（LLM_API_KEY 等可能在环境中）
         env = os.environ.copy()
         
         with open(output_file, 'w', encoding='utf-8') as f:
-            result = subprocess.run(
-                cmd,
-                stdout=f,
-                stderr=subprocess.PIPE,
-                text=True,
-                timeout=1800,  # 30 分钟超时
-                env=env
-            )
+            result = subprocess.run(cmd, stdout=f, stderr=subprocess.PIPE, text=True, timeout=1800, env=env)
         
-        # 解析 JSON 输出，提取关键信息
         execution_summary = parse_openhands_json_output(output_file, issue_number)
         
-        # 清理临时文件
         try:
             os.unlink(output_file)
         except:
@@ -170,33 +212,21 @@ def trigger_openhands_headless(task_description: str, issue_number: int) -> tupl
             return True, f"成功处理 Issue #{issue_number}. {execution_summary}"
         else:
             logger.error(f"❌ OpenHands 处理失败 - Issue #{issue_number}")
-            logger.error(f"STDOUT: {result.stdout[:500] if result.stdout else 'None'}")
-            logger.error(f"STDERR: {result.stderr[:500] if result.stderr else 'None'}")
             return False, f"处理失败：{result.stderr[:500] if result.stderr else result.stdout[:500]}"
             
     except subprocess.TimeoutExpired:
         logger.error(f"⏱️ OpenHands 执行超时 - Issue #{issue_number}")
         return False, "执行超时（30 分钟）"
     except FileNotFoundError:
-        logger.error(f"❌ openhands 命令未找到 - 请确保已安装 OpenHands CLI")
-        logger.error(f"安装方法：pip install openhands-ai")
-        return False, "openhands 命令未找到，请先安装 OpenHands CLI (pip install openhands-ai)"
+        logger.error(f"❌ openhands 命令未找到")
+        return False, "openhands 命令未找到 (pip install openhands-ai)"
     except Exception as e:
         logger.error(f"❌ 执行出错：{str(e)}")
         return False, f"执行错误：{str(e)}"
 
 
 def parse_openhands_json_output(output_file: str, issue_number: int) -> str:
-    """
-    解析 OpenHands 的 JSON 输出，提取关键处理信息
-    
-    Args:
-        output_file: JSON 输出文件路径
-        issue_number: Issue 号码
-        
-    Returns:
-        执行摘要信息
-    """
+    """解析 OpenHands 的 JSON 输出"""
     try:
         actions = []
         thoughts = []
@@ -205,93 +235,79 @@ def parse_openhands_json_output(output_file: str, issue_number: int) -> str:
         with open(output_file, 'r', encoding='utf-8') as f:
             for line in f:
                 line = line.strip()
-                # 跳过非 JSON 行（装饰性文本）
-                if not line or any(x in line for x in ['OpenHands CLI', 'Initializing', 'Agent is', 'Agent finished', '─', '✓', 'To override', 'Hint:', 'Goodbye', 'Conversation', '--JSON Event--']):
+                skip_patterns = ['OpenHands CLI', 'Initializing', 'Agent is', 'Agent finished', '─', '✓', 'To override', 'Hint:', 'Goodbye', 'Conversation', '--JSON Event--']
+                if not line or any(x in line for x in skip_patterns):
                     continue
                 
                 try:
                     event = json.loads(line)
                     kind = event.get('kind', '')
                     
-                    # 提取 ActionEvent (工具调用)
                     if kind == 'ActionEvent':
                         tool_name = event.get('tool_name', '')
                         summary = event.get('summary', '')
                         reasoning = event.get('reasoning_content', '')
-                        
                         action_info = f"🔧 {tool_name}"
                         if summary:
                             action_info += f": {summary[:150]}"
                         actions.append(action_info)
-                        
                         if reasoning:
                             thoughts.append(f"💡 {reasoning[:150]}")
                     
-                    # 提取 MessageEvent (对话)
                     elif kind == 'MessageEvent':
                         source = event.get('source', '')
                         llm_message = event.get('llm_message', {})
                         content = llm_message.get('content', [])
-                        
                         if content:
                             text = ''
                             for item in content:
                                 if item.get('type') == 'text':
                                     text = item.get('text', '')[:150]
-                            
                             if text:
                                 emoji = "🤖" if source == 'agent' else "👤"
                                 conversation.append(f"{emoji} {text}")
                     
-                    # 提取 ObservationEvent (观察结果)
                     elif kind == 'ObservationEvent':
                         observation = event.get('observation', {})
                         content = observation.get('content', [])
-                        
                         if content:
                             for item in content:
                                 if item.get('type') == 'text':
                                     obs = item.get('text', '')[:150]
                                     if obs:
                                         actions.append(f"👁️ {obs}")
-                    
                 except json.JSONDecodeError:
-                    # 非 JSON 行，跳过
                     continue
         
-        # 构建摘要
         summary_parts = []
-        
         if actions:
-            summary_parts.append(f"
-📋 执行的操作 ({len(actions)}):")
+            summary_parts.append("")
+            summary_parts.append(f"📋 执行的操作 ({len(actions)}):")
             for i, action in enumerate(actions[:10], 1):
                 summary_parts.append(f"  {i}. {action}")
             if len(actions) > 10:
                 summary_parts.append(f"  ... 还有 {len(actions) - 10} 个操作")
         
         if thoughts:
-            summary_parts.append(f"
-💡 推理过程 ({len(thoughts)}):")
+            summary_parts.append("")
+            summary_parts.append(f"💡 推理过程 ({len(thoughts)}):")
             for i, thought in enumerate(thoughts[:5], 1):
                 summary_parts.append(f"  {i}. {thought}")
         
         if conversation:
-            summary_parts.append(f"
-💬 对话摘要 ({len(conversation)}):")
+            summary_parts.append("")
+            summary_parts.append(f"💬 对话摘要 ({len(conversation)}):")
             for i, msg in enumerate(conversation[:5], 1):
                 summary_parts.append(f"  {i}. {msg}")
         
         if not summary_parts:
             return "OpenHands 已执行完成"
         
-        return "
-".join(summary_parts)
+        return chr(10).join(summary_parts)
         
     except Exception as e:
         logger.error(f"解析 JSON 输出失败：{e}")
         return f"OpenHands 已执行，但解析输出失败：{str(e)}"
-
 
 
 def should_trigger_issue_event(data: dict) -> bool:
