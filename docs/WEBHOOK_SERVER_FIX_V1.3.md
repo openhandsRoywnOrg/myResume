@@ -5,16 +5,18 @@
 ### 主要变更
 
 1. **✅ 更新 OpenHands 启动命令**
-   - 旧命令：`openhands-agent --issue-number 42 --auto-pr`
-   - 新命令：`openhands --headless -t "<task>" -d "/workspace" --repo <repo> --issue-number 42 --auto-pr`
+   - 旧命令：`docker run ... ghcr.io/openhands/openhands:1.4 openhands-agent --issue-number 42 --auto-pr`
+   - **新命令**：`openhands --headless -t "<task>" --repo <repo> --issue-number 42 --auto-pr`
+   - **关键**：直接执行本地 `openhands` 命令，不再使用 Docker
 
-2. **✅ 更新镜像版本**
-   - 旧版本：`ghcr.io/openhands/openhands:1.4`
-   - 新版本：`ghcr.io/openhands/openhands:1.9`
-
-3. **✅ 改进任务描述构建**
+2. **✅ 改进任务描述构建**
    - 现在会提取 Issue 标题和描述
    - 构建更详细的任务描述传递给 OpenHands
+   - 格式：`Fix issue #42 in owner/repo: <title>\n\n<body>`
+
+3. **✅ 添加 FileNotFoundError 处理**
+   - 如果 `openhands` 命令未找到，会返回友好的错误信息
+   - 提示用户安装 OpenHands CLI
 
 4. **✅ 保留所有之前的修复**
    - 支持 Issue 创建时带标签（`opened` 事件）
@@ -24,6 +26,21 @@
    - 签名验证日志
 
 ## 🚀 部署方法
+
+### 前置要求
+
+**必须安装 OpenHands CLI**：
+
+```bash
+# 方法 1：使用 pip
+pip install openhands-ai
+
+# 方法 2：使用官方安装脚本
+curl -sSL https://install.openhands.dev | bash
+
+# 验证安装
+openhands --version
+```
 
 ### 方法 1：使用自动部署脚本（推荐）
 
@@ -60,15 +77,15 @@ docker run -d \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v /app/logs:/app/logs \
   -v /workspace/project/myResume/scripts/webhook_server_v1.3.py:/app/webhook_server.py:ro \
+  -v /home/ubuntu/.openhands:/root/.openhands \
   -e WEBHOOK_SECRET="$WEBHOOK_SECRET" \
   -e GITHUB_TOKEN="$GITHUB_TOKEN" \
   -e LLM_API_KEY="$LLM_API_KEY" \
   -e LLM_BASE_URL="$LLM_BASE_URL" \
   -e LLM_MODEL="$LLM_MODEL" \
-  -e OPENHANDS_IMAGE="ghcr.io/openhands/openhands:1.9" \
   -e WORKSPACE_PATH="/workspace" \
   python:3.12-slim \
-  python /app/webhook_server.py
+  bash -c "pip install openhands-ai && python /app/webhook_server.py"
 
 # 4. 验证
 curl http://localhost:5001/health
@@ -76,14 +93,10 @@ curl http://localhost:5001/health
 
 ## 📝 命令格式说明
 
-### 新的 Docker 命令结构
+### 新的命令结构
 
 ```bash
-docker run [OPTIONS] ghcr.io/openhands/openhands:1.9 \
-  openhands \
-  --headless \
-  -t "<task description>" \
-  -d "<workspace directory>" \
+openhands --headless -t "<task description>" \
   --repo <repository> \
   --issue-number <number> \
   --auto-pr
@@ -95,7 +108,6 @@ docker run [OPTIONS] ghcr.io/openhands/openhands:1.9 \
 |------|------|------|
 | `--headless` | 无头模式（无 GUI） | 必需 |
 | `-t` | 任务描述 | `"Fix issue #42: Bug in login"` |
-| `-d` | 工作目录 | `/workspace` |
 | `--repo` | 仓库名称 | `openhandsRoywnOrg/myResume` |
 | `--issue-number` | Issue 编号 | `42` |
 | `--auto-pr` | 自动创建 PR | 可选 |
@@ -108,9 +120,8 @@ docker run [OPTIONS] ghcr.io/openhands/openhands:1.9 \
 | `LLM_API_KEY` | LLM API Key | 必需 |
 | `LLM_BASE_URL` | LLM API 基础 URL | `https://coding.dashscope.aliyuncs.com/v1` |
 | `LLM_MODEL` | LLM 模型名称 | `openai/qwen3.5-plus` |
-| `OPENHANDS_IMAGE` | OpenHands 镜像版本 | `ghcr.io/openhands/openhands:1.9` |
-| `WORKSPACE_PATH` | 工作目录路径 | `/workspace` |
 | `WEBHOOK_SECRET` | Webhook 签名密钥 | 必需 |
+| `WORKSPACE_PATH` | 工作目录路径 | `/workspace` |
 
 ## 🧪 测试方法
 

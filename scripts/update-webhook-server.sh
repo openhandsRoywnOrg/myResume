@@ -1,6 +1,6 @@
 #!/bin/bash
 # Webhook 服务器更新脚本 - v1.3
-# 使用 openhands --headless -t 命令
+# 使用本地 openhands --headless -t 命令
 
 set -e
 
@@ -8,14 +8,24 @@ echo "======================================"
 echo "Webhook 服务器更新 - v1.3"
 echo "======================================"
 
-# 1. 停止现有容器
-echo "📦 停止现有容器..."
-docker stop openhands-webhook-server || true
-docker rm openhands-webhook-server || true
+# 1. 检查 openhands 命令是否存在
+echo "🔍 检查 OpenHands CLI 安装..."
+if ! command -v openhands &> /dev/null; then
+    echo "❌ 错误：openhands 命令未找到！"
+    echo "请先安装 OpenHands CLI："
+    echo "   pip install openhands-ai"
+    echo "或者："
+    echo "   curl -sSL https://install.openhands.dev | bash"
+    exit 1
+fi
 
-# 2. 拉取最新镜像
-echo "🔄 拉取最新 OpenHands 镜像..."
-docker pull ghcr.io/openhands/openhands:1.9
+echo "✅ OpenHands CLI 已安装：$(which openhands)"
+openhands --version || true
+
+# 2. 停止现有容器
+echo "📦 停止现有容器..."
+docker stop openhands-webhook-server 2>/dev/null || true
+docker rm openhands-webhook-server 2>/dev/null || true
 
 # 3. 复制新版本的 webhook 服务器代码
 echo "📝 复制 webhook 服务器代码..."
@@ -32,7 +42,7 @@ echo "📁 创建日志目录..."
 sudo mkdir -p /app/logs
 sudo chmod 777 /app/logs
 
-# 5. 启动新容器
+# 5. 启动新容器（使用 Python 镜像，不需要 Docker in Docker）
 echo "🚀 启动新的 webhook 服务器..."
 docker run -d \
     --name openhands-webhook-server \
@@ -41,15 +51,15 @@ docker run -d \
     -v /var/run/docker.sock:/var/run/docker.sock \
     -v /app/logs:/app/logs \
     -v "$WEBHOOK_CODE:/app/webhook_server.py:ro" \
+    -v /home/ubuntu/.openhands:/root/.openhands \
     -e WEBHOOK_SECRET="$WEBHOOK_SECRET" \
     -e GITHUB_TOKEN="$GITHUB_TOKEN" \
     -e LLM_API_KEY="$LLM_API_KEY" \
     -e LLM_BASE_URL="$LLM_BASE_URL" \
     -e LLM_MODEL="$LLM_MODEL" \
-    -e OPENHANDS_IMAGE="ghcr.io/openhands/openhands:1.9" \
     -e WORKSPACE_PATH="/workspace" \
     python:3.12-slim \
-    python /app/webhook_server.py
+    bash -c "pip install openhands-ai && python /app/webhook_server.py"
 
 # 6. 等待启动
 echo "⏳ 等待服务启动..."
@@ -65,7 +75,6 @@ if curl -f http://localhost:5001/health; then
     echo "  - 端口：5001"
     echo "  - 健康检查：http://localhost:5001/health"
     echo "  - 日志查看：http://localhost:5001/logs"
-    echo "  - 镜像版本：ghcr.io/openhands/openhands:1.9"
     echo "  - 命令模式：openhands --headless -t"
     echo "======================================"
 else

@@ -24,10 +24,6 @@ LLM_API_KEY = os.environ.get('LLM_API_KEY')
 LLM_BASE_URL = os.environ.get('LLM_BASE_URL', 'https://coding.dashscope.aliyuncs.com/v1')
 LLM_MODEL = os.environ.get('LLM_MODEL', 'openai/qwen3.5-plus')
 
-# ✅ 使用更新的镜像版本
-OPENHANDS_IMAGE = os.environ.get('OPENHANDS_IMAGE', 'ghcr.io/openhands/openhands:1.9')
-WORKSPACE_PATH = os.environ.get('WORKSPACE_PATH', '/workspace')
-
 # 日志配置
 log_file = '/app/logs/webhook.log'
 os.makedirs(os.path.dirname(log_file), exist_ok=True)
@@ -109,41 +105,29 @@ def trigger_openhands_cli(event_type: str, event_data: dict) -> tuple[bool, str]
         issue_body = event_data.get('issue', {}).get('body', 'No description')
         
         # ✅ 构建任务描述
-        task_description = f"Fix issue #{issue_number}: {issue_title}\n\n{issue_body[:500]}"
+        task_description = f"Fix issue #{issue_number} in {repo}: {issue_title}\n\n{issue_body[:500] if issue_body else 'No description'}"
         
-        # ✅ 修复：使用 openhands --headless -t 命令
-        # 命令格式：docker run ... openhands --headless -t "<task>" -d "<workspace>"
+        # ✅ 修复：直接执行本地 openhands 命令（不是 Docker）
+        # 命令格式：openhands --headless -t "<task>"
         cmd = [
-            'docker', 'run', '--rm',
-            '-v', '/var/run/docker.sock:/var/run/docker.sock',
-            '-v', f'{WORKSPACE_PATH}:/workspace',
-            '-e', f'GITHUB_TOKEN={GITHUB_TOKEN}',
-            '-e', f'LLM_API_KEY={LLM_API_KEY}',
-            '-e', f'LLM_BASE_URL={LLM_BASE_URL}',
-            '-e', f'LLM_MODEL={LLM_MODEL}',
-            '-e', 'CONFIRMATION_MODE=false',
-            '-e', f'WORKSPACE_MOUNT_PATH={WORKSPACE_PATH}',
-            '-e', f'REPO_NAME={repo}',
-            '-e', f'ISSUE_NUMBER={issue_number}',
-            OPENHANDS_IMAGE,
             'openhands',
             '--headless',
             '-t', task_description,
-            '-d', '/workspace',
             '--repo', repo,
             '--issue-number', str(issue_number),
             '--auto-pr'
         ]
         
         logger.info(f"触发 OpenHands CLI - Issue #{issue_number} - Repo: {repo}")
-        logger.info(f"命令：docker run ... openhands --headless -t \"{task_description[:100]}...\"")
+        logger.info(f"命令：{' '.join(cmd)}")
         
         # 执行命令
         result = subprocess.run(
             cmd,
             capture_output=True,
             text=True,
-            timeout=1800  # 30 分钟超时
+            timeout=1800,  # 30 分钟超时
+            env={**os.environ}  # 继承当前环境变量
         )
         
         if result.returncode == 0:
@@ -159,6 +143,9 @@ def trigger_openhands_cli(event_type: str, event_data: dict) -> tuple[bool, str]
     except subprocess.TimeoutExpired:
         logger.error(f"OpenHands 执行超时 - Issue #{issue_number}")
         return False, "执行超时（30 分钟）"
+    except FileNotFoundError:
+        logger.error(f"openhands 命令未找到 - 请确保已安装 OpenHands CLI")
+        return False, "openhands 命令未找到，请先安装 OpenHands CLI"
     except Exception as e:
         logger.error(f"执行出错：{str(e)}")
         return False, f"执行错误：{str(e)}"
@@ -336,7 +323,6 @@ def get_logs():
 if __name__ == '__main__':
     logger.info("=" * 50)
     logger.info("OpenHands Webhook 服务器启动 v1.3")
-    logger.info(f"镜像版本：{OPENHANDS_IMAGE}")
     logger.info(f"命令模式：openhands --headless -t")
     logger.info(f"监听端口：5001")
     logger.info("=" * 50)
