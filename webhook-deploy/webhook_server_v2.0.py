@@ -226,7 +226,12 @@ def trigger_openhands_headless(task_description: str, issue_number: int) -> tupl
 
 
 def parse_openhands_json_output(output_file: str, issue_number: int) -> str:
-    """解析 OpenHands 的 JSON 输出"""
+    """
+    解析 OpenHands 的 JSON 输出，提取关键处理信息
+    
+    根据官方文档：https://docs.openhands.dev/sdk/arch/events
+    JSONL 输出包含多种事件类型，需要正确处理
+    """
     try:
         actions = []
         thoughts = []
@@ -235,51 +240,107 @@ def parse_openhands_json_output(output_file: str, issue_number: int) -> str:
         with open(output_file, 'r', encoding='utf-8') as f:
             for line in f:
                 line = line.strip()
-                skip_patterns = ['OpenHands CLI', 'Initializing', 'Agent is', 'Agent finished', '─', '✓', 'To override', 'Hint:', 'Goodbye', 'Conversation', '--JSON Event--']
-                if not line or any(x in line for x in skip_patterns):
+                # 跳过空行和装饰性文本
+                if not line:
+                    continue
+                
+                skip_patterns = [
+                    'OpenHands CLI', 'Initializing', 'Agent is', 
+                    'Agent finished', '─', '✓', 'To override', 
+                    'Hint:', 'Goodbye', 'Conversation', '--JSON Event--'
+                ]
+                if any(x in line for x in skip_patterns):
                     continue
                 
                 try:
+                    # 解析 JSON
                     event = json.loads(line)
+                    
+                    # 确保 event 是字典（某些行可能是字符串或其他类型）
+                    if not isinstance(event, dict):
+                        continue
+                    
                     kind = event.get('kind', '')
                     
+                    # 根据官方文档处理不同类型的事件
+                    # https://docs.openhands.dev/sdk/arch/events
+                    
                     if kind == 'ActionEvent':
-                        tool_name = event.get('tool_name', '')
-                        summary = event.get('summary', '')
-                        reasoning = event.get('reasoning_content', '')
-                        action_info = f"🔧 {tool_name}"
-                        if summary:
-                            action_info += f": {summary[:150]}"
-                        actions.append(action_info)
+                        # ActionEvent: 工具调用
+                        tool_name = event.get('tool_name', '') or ''
+                        summary = event.get('summary', '') or ''
+                        reasoning = event.get('reasoning_content', '') or ''
+                        thought = event.get('thought', '') or ''
+                        
+                        # 构建工具调用信息
+                        if tool_name:
+                            action_info = f"🔧 {tool_name}"
+                            if summary:
+                                action_info += f": {summary[:150]}"
+                            actions.append(action_info)
+                        
+                        # 提取推理过程
                         if reasoning:
                             thoughts.append(f"💡 {reasoning[:150]}")
+                        elif thought and isinstance(thought, str):
+                            thoughts.append(f"💡 {thought[:150]}")
                     
                     elif kind == 'MessageEvent':
+                        # MessageEvent: 用户/助手消息
                         source = event.get('source', '')
                         llm_message = event.get('llm_message', {})
+                        
+                        # 确保 llm_message 是字典
+                        if not isinstance(llm_message, dict):
+                            continue
+                        
                         content = llm_message.get('content', [])
-                        if content:
+                        
+                        if content and isinstance(content, list):
                             text = ''
                             for item in content:
-                                if item.get('type') == 'text':
+                                if isinstance(item, dict) and item.get('type') == 'text':
                                     text = item.get('text', '')[:150]
+                                    break
+                            
                             if text:
                                 emoji = "🤖" if source == 'agent' else "👤"
                                 conversation.append(f"{emoji} {text}")
                     
                     elif kind == 'ObservationEvent':
+                        # ObservationEvent: 工具执行结果
                         observation = event.get('observation', {})
+                        
+                        if not isinstance(observation, dict):
+                            continue
+                        
                         content = observation.get('content', [])
-                        if content:
+                        
+                        if content and isinstance(content, list):
                             for item in content:
-                                if item.get('type') == 'text':
+                                if isinstance(item, dict) and item.get('type') == 'text':
                                     obs = item.get('text', '')[:150]
                                     if obs:
                                         actions.append(f"👁️ {obs}")
+                                    break
+                    
+                    elif kind == 'AgentErrorEvent':
+                        # AgentErrorEvent: Agent 错误
+                        error_msg = event.get('message', '') or event.get('error', '')
+                        if error_msg:
+                            actions.append(f"❌ 错误：{error_msg[:150]}")
+                    
                 except json.JSONDecodeError:
+                    # 非 JSON 行，跳过
+                    continue
+                except (AttributeError, TypeError, KeyError) as e:
+                    # 数据结构不符合预期，跳过
+                    logger.debug(f"解析事件时出错：{e}")
                     continue
         
+        # 构建摘要
         summary_parts = []
+        
         if actions:
             summary_parts.append("")
             summary_parts.append(f"📋 执行的操作 ({len(actions)}):")
@@ -301,13 +362,16 @@ def parse_openhands_json_output(output_file: str, issue_number: int) -> str:
                 summary_parts.append(f"  {i}. {msg}")
         
         if not summary_parts:
-            return "OpenHands 已执行完成"
+            return "OpenHands 已执行完成（无详细输出）"
         
+        # 使用 chr(10) 避免 f-string 语法错误
         return chr(10).join(summary_parts)
         
     except Exception as e:
         logger.error(f"解析 JSON 输出失败：{e}")
         return f"OpenHands 已执行，但解析输出失败：{str(e)}"
+
+
 
 
 def should_trigger_issue_event(data: dict) -> bool:
