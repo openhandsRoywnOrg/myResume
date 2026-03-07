@@ -67,7 +67,7 @@ docker run -d \
     -v "$HOME/.openhands:/root/.openhands" \
     -e WEBHOOK_SECRET="$WEBHOOK_SECRET" \
     python:3.12-slim \
-    bash -c "pip install flask && python /app/webhook_server.py"
+    bash -c "pip install flask openhands-ai && python /app/webhook_server.py"
 
 # 7. 等待启动
 echo "⏳ 等待服务启动..."
