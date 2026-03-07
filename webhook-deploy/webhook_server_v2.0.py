@@ -241,6 +241,9 @@ def parse_openhands_json_output(output_file: str, issue_number: int) -> str:
                 
                 try:
                     event = json.loads(line)
+                    # 确保 event 是字典
+                    if not isinstance(event, dict):
+                        continue
                     kind = event.get('kind', '')
                     
                     if kind == 'ActionEvent':
