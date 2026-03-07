@@ -1,7 +1,18 @@
 #!/usr/bin/env python3
 """
-GitHub Webhook 服务器 - 触发 OpenHands CLI
-修复版本：v1.3 - 使用 openhands --headless -t 命令
+GitHub Webhook 服务器 - 触发 OpenHands CLI (Headless 模式)
+版本：v2.0 - 基于官方文档修正
+
+支持触发条件：
+- Issue 添加标签：ai-agent 或 fix-me
+- PR 添加标签：ai-agent
+- Issue 评论：包含 @openhands-agent
+- PR 审查：包含 @openhands-agent
+- PR 审查评论：包含 @openhands-agent
+
+文档参考：
+- https://docs.openhands.dev/openhands/usage/cli/command-reference
+- https://docs.openhands.dev/openhands/usage/cli/headless
 """
 
 from flask import Flask, request, jsonify
@@ -19,10 +30,6 @@ app = Flask(__name__)
 
 # ==================== 配置 ====================
 WEBHOOK_SECRET = os.environ.get('WEBHOOK_SECRET', '2d52d08e4ee7a0bdc559ea6274411da54df57ced')
-GITHUB_TOKEN = os.environ.get('GITHUB_TOKEN')
-LLM_API_KEY = os.environ.get('LLM_API_KEY')
-LLM_BASE_URL = os.environ.get('LLM_BASE_URL', 'https://coding.dashscope.aliyuncs.com/v1')
-LLM_MODEL = os.environ.get('LLM_MODEL', 'openai/qwen3.5-plus')
 
 # 日志配置
 log_file = '/app/logs/webhook.log'
@@ -38,7 +45,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# 去重机制
+# 去重机制（5 分钟窗口）
 processed_events = {}
 
 def is_duplicate_event(delivery_id: str) -> bool:
@@ -80,54 +87,63 @@ def verify_signature(payload: bytes, signature: str) -> bool:
     return result
 
 
-def trigger_openhands_cli(event_type: str, event_data: dict) -> tuple[bool, str]:
+def build_task_description(issue_number: int, repo: str, title: str, body: str) -> str:
     """
-    触发 OpenHands CLI
+    构建任务描述
     
-    使用命令：openhands --headless -t "<task>"
+    根据官方文档，task 应该清晰描述需要完成的工作
+    """
+    task = f"Please fix GitHub issue #{issue_number} in repository {repo}\n\n"
+    task += f"Issue Title: {title}\n\n"
+    
+    if body:
+        # 限制 body 长度，避免命令过长
+        body_preview = body[:1000] if len(body) > 1000 else body
+        task += f"Issue Description:\n{body_preview}\n\n"
+    
+    task += "Please analyze the issue, implement the necessary code changes, and create a pull request if needed."
+    
+    return task
+
+
+def trigger_openhands_headless(task_description: str, issue_number: int) -> tuple[bool, str]:
+    """
+    触发 OpenHands CLI (Headless 模式)
+    
+    根据官方文档，正确的命令格式：
+    openhands --headless -t "<task>" --exit-without-confirmation
+    
+    可选：--json 用于结构化输出
     
     Returns:
         (success, message)
     """
     try:
-        # 提取 Issue 号码
-        issue_number = None
-        if 'issue' in event_data:
-            issue_number = event_data['issue'].get('number')
-        elif 'pull_request' in event_data:
-            issue_number = event_data['pull_request'].get('number')
-        
-        if not issue_number:
-            return False, "无法提取 Issue 号码"
-        
-        repo = event_data.get('repository', {}).get('full_name', 'openhandsRoywnOrg/myResume')
-        issue_title = event_data.get('issue', {}).get('title', 'No title')
-        issue_body = event_data.get('issue', {}).get('body', 'No description')
-        
-        # ✅ 构建任务描述
-        task_description = f"Fix issue #{issue_number} in {repo}: {issue_title}\n\n{issue_body[:500] if issue_body else 'No description'}"
-        
-        # ✅ 修复：直接执行本地 openhands 命令（不是 Docker）
-        # 命令格式：openhands --headless -t "<task>"
+        # ✅ 正确的命令格式（基于官方文档）
+        # 注意：不需要传 LLM 和 GitHub token，这些在 ~/.openhands/ 中配置
         cmd = [
             'openhands',
             '--headless',
             '-t', task_description,
-            '--repo', repo,
-            '--issue-number', str(issue_number),
-            '--auto-pr'
+            '--exit-without-confirmation'
         ]
         
-        logger.info(f"触发 OpenHands CLI - Issue #{issue_number} - Repo: {repo}")
-        logger.info(f"命令：{' '.join(cmd)}")
+        # 可选：添加 --json 用于结构化输出（便于解析）
+        # cmd.append('--json')
+        
+        logger.info(f"触发 OpenHands Headless - Issue #{issue_number}")
+        logger.info(f"命令：openhands --headless -t \"Please fix GitHub issue #{issue_number}...\"")
         
         # 执行命令
+        # 注意：需要继承环境变量（LLM_API_KEY 等可能在环境中）
+        env = os.environ.copy()
+        
         result = subprocess.run(
             cmd,
             capture_output=True,
             text=True,
             timeout=1800,  # 30 分钟超时
-            env={**os.environ}  # 继承当前环境变量
+            env=env
         )
         
         if result.returncode == 0:
@@ -137,15 +153,18 @@ def trigger_openhands_cli(event_type: str, event_data: dict) -> tuple[bool, str]
             logger.info(f"输出：{output}")
             return True, f"成功处理 Issue #{issue_number}"
         else:
-            logger.error(f"OpenHands 处理失败 - Issue #{issue_number}: {result.stderr}")
-            return False, f"处理失败：{result.stderr[:500]}"
+            logger.error(f"OpenHands 处理失败 - Issue #{issue_number}")
+            logger.error(f"STDOUT: {result.stdout[:500] if result.stdout else 'None'}")
+            logger.error(f"STDERR: {result.stderr[:500] if result.stderr else 'None'}")
+            return False, f"处理失败：{result.stderr[:500] if result.stderr else result.stdout[:500]}"
             
     except subprocess.TimeoutExpired:
         logger.error(f"OpenHands 执行超时 - Issue #{issue_number}")
         return False, "执行超时（30 分钟）"
     except FileNotFoundError:
         logger.error(f"openhands 命令未找到 - 请确保已安装 OpenHands CLI")
-        return False, "openhands 命令未找到，请先安装 OpenHands CLI"
+        logger.error(f"安装方法：pip install openhands-ai")
+        return False, "openhands 命令未找到，请先安装 OpenHands CLI (pip install openhands-ai)"
     except Exception as e:
         logger.error(f"执行出错：{str(e)}")
         return False, f"执行错误：{str(e)}"
@@ -155,7 +174,7 @@ def should_trigger_issue_event(data: dict) -> bool:
     """检查 Issue 事件是否应该触发"""
     action = data.get('action', '')
     
-    # ✅ 支持 opened 和 labeled 两种情况
+    # 支持 opened 和 labeled 两种情况
     if action not in ['opened', 'labeled']:
         return False
     
@@ -180,8 +199,8 @@ def should_trigger_comment_event(data: dict) -> bool:
         return False
     
     comment = data.get('comment', {}).get('body', '')
-    # ✅ 添加更多触发关键词
-    triggers = ['@openhands-agent', '/fix', '/openhands', '请处理']
+    # 触发关键词
+    triggers = ['@openhands-agent', '/fix', '/openhands']
     return any(trigger in comment for trigger in triggers)
 
 
@@ -210,7 +229,8 @@ def health():
     return jsonify({
         'status': 'ok',
         'timestamp': datetime.utcnow().isoformat(),
-        'service': 'openhands-webhook-server'
+        'service': 'openhands-webhook-server-v2',
+        'version': '2.0 (Headless Mode)'
     }), 200
 
 
@@ -221,7 +241,7 @@ def webhook():
     delivery = request.headers.get('X-GitHub-Delivery')
     event = request.headers.get('X-GitHub-Event')
     
-    # ✅ 检查重复事件
+    # 检查重复事件
     if is_duplicate_event(delivery):
         logger.info(f"重复事件，忽略 - Delivery: {delivery}")
         return jsonify({'status': 'duplicate'}), 200
@@ -244,6 +264,7 @@ def webhook():
     
     logger.info(f"收到事件 - Type: {event}, Delivery: {delivery}, Action: {data.get('action')}")
     
+    # 判断是否满足触发条件
     should_trigger = False
     event_type = ''
     
@@ -279,17 +300,43 @@ def webhook():
             'reason': 'Event does not match trigger conditions'
         }), 200
     
+    # 提取 Issue 信息
     issue_number = None
+    issue_title = ''
+    issue_body = ''
+    repo = ''
+    
     if 'issue' in data:
         issue_number = data['issue'].get('number')
+        issue_title = data['issue'].get('title', '')
+        issue_body = data['issue'].get('body', '') or ''
+        repo = data['repository'].get('full_name', '')
     elif 'pull_request' in data:
         issue_number = data['pull_request'].get('number')
+        issue_title = data['pull_request'].get('title', '')
+        issue_body = data['pull_request'].get('body', '') or ''
+        repo = data['repository'].get('full_name', '')
+    
+    if not issue_number:
+        logger.error("无法提取 Issue 号码")
+        return jsonify({'error': 'Cannot extract issue number'}), 400
     
     logger.info(f"触发条件满足 - {event_type} - Issue #{issue_number}")
     
+    # 构建任务描述
+    task_description = build_task_description(issue_number, repo, issue_title, issue_body)
+    logger.info(f"任务描述：{task_description[:200]}...")
+    
+    # 异步执行 OpenHands
     def run_async():
-        success, message = trigger_openhands_cli(event_type, data)
+        success, message = trigger_openhands_headless(task_description, issue_number)
         logger.info(f"异步执行结果 - 成功：{success}, 消息：{message}")
+        
+        # 可选：在 GitHub Issue 上添加评论
+        # if success:
+        #     add_github_comment(repo, issue_number, "✅ OpenHands 已完成处理")
+        # else:
+        #     add_github_comment(repo, issue_number, f"❌ OpenHands 处理失败：{message}")
     
     thread = threading.Thread(target=run_async)
     thread.daemon = True
@@ -299,7 +346,7 @@ def webhook():
         'status': 'accepted',
         'event_type': event_type,
         'issue_number': issue_number,
-        'message': 'OpenHands 正在处理中',
+        'message': 'OpenHands 正在处理中 (Headless Mode)',
         'timestamp': datetime.utcnow().isoformat()
     }), 202
 
@@ -321,10 +368,16 @@ def get_logs():
 
 # ==================== 主程序 ====================
 if __name__ == '__main__':
-    logger.info("=" * 50)
-    logger.info("OpenHands Webhook 服务器启动 v1.3")
-    logger.info(f"命令模式：openhands --headless -t")
+    logger.info("=" * 60)
+    logger.info("OpenHands Webhook 服务器启动 v2.0")
+    logger.info("模式：Headless (无 UI)")
+    logger.info("参考文档:")
+    logger.info("  - https://docs.openhands.dev/openhands/usage/cli/command-reference")
+    logger.info("  - https://docs.openhands.dev/openhands/usage/cli/headless")
     logger.info(f"监听端口：5001")
-    logger.info("=" * 50)
+    logger.info(f"Webhook 路径：/webhook/github")
+    logger.info(f"健康检查：/health")
+    logger.info(f"日志文件：{log_file}")
+    logger.info("=" * 60)
     
     app.run(host='0.0.0.0', port=5001, debug=False, threaded=True)
