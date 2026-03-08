@@ -1,0 +1,42 @@
+name: Forward to OpenHands Server
+
+on:
+  issues:
+    types: [labeled, reopened, opened]
+  pull_request:
+    types: [labeled, reopened, opened]
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  pull_request_review:
+    types: [submitted]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  forward-event:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Forward to 自建 Webhook 服务器
+        id: webhook
+        env:
+          WEBHOOK_URL: ${{ secrets.OPENHANDS_SERVER_URL }}
+          WEBHOOK_SECRET: ${{ secrets.OPENHANDS_WEBHOOK_SECRET }}
+          GITHUB_EVENT: ${{ github.event_name }}
+          GITHUB_PAYLOAD: ${{ toJSON(github.event) }}
+        run: |
+          # 计算 HMAC-SHA256 签名
+          SIGNATURE="sha256=$(echo -n "$GITHUB_PAYLOAD" | openssl dgst -sha256 -hmac "$WEBHOOK_SECRET" | awk '{print $2}')"
+          
+          # 发送带签名的请求
+          curl -v -X POST "$WEBHOOK_URL/webhook/github" \
+            -H "Content-Type: application/json" \
+            -H "X-GitHub-Event: $GITHUB_EVENT" \
+            -H "X-Hub-Signature-256: $SIGNATURE" \
+            -d "$GITHUB_PAYLOAD"
+          
+          echo "signature=$SIGNATURE" >> $GITHUB_OUTPUT
