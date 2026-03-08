@@ -44,6 +44,9 @@ jobs:
     outputs:
       has-macro-label: ${{ steps.check-labels.outputs.has-macro-label }}
     steps:
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
       - name: Check if issue/PR has macro label
         id: check-labels
         run: |
