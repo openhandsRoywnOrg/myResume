@@ -8,7 +8,7 @@ from flask import Flask
 from flask.testing import FlaskClient
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='function')
 def app():
     """创建测试应用实例"""
     app = create_app('testing')

@@ -137,54 +137,14 @@ class TestUserModel:
 class TestAuthDecorators:
     """测试认证装饰器"""
     
-    @pytest.fixture
-    def test_app(self, app):
-        """创建带有测试路由的应用"""
-        # 注册错误处理器
-        from app.api.deps import register_auth_error_handlers
-        register_auth_error_handlers(app)
-        
-        # 创建测试路由
-        @app.route('/api/test/auth-required')
-        @require_auth
-        def auth_required():
-            user = get_current_user()
-            return {'user': user.to_dict()}
-        
-        @app.route('/api/test/admin-only')
-        @require_admin
-        def admin_only():
-            return {'message': 'Admin access granted'}
-        
-        @app.route('/api/test/super-admin-only')
-        @require_super_admin
-        def super_admin_only():
-            return {'message': 'Super admin access granted'}
-        
-        @app.route('/api/test/role-check')
-        @require_role('user', 'admin')
-        def role_check():
-            return {'message': 'User or admin access granted'}
-        
-        @app.route('/api/test/optional-auth')
-        @optional_auth
-        def optional_auth_route():
-            user = get_current_user()
-            if user:
-                return {'authenticated': True, 'user': user.to_dict()}
-            else:
-                return {'authenticated': False}
-        
-        return app
-    
-    def test_require_auth_without_token(self, client, test_app):
+    def test_require_auth_without_token(self, client):
         """测试未提供 token 时要求认证"""
         response = client.get('/api/test/auth-required')
         assert response.status_code == 401
         data = response.get_json()
         assert 'msg' in data or 'error' in data
     
-    def test_require_auth_with_valid_token(self, auth_client, test_app):
+    def test_require_auth_with_valid_token(self, auth_client):
         """测试使用有效 token 要求认证"""
         response = auth_client.get('/api/test/auth-required')
         assert response.status_code == 200
@@ -192,7 +152,7 @@ class TestAuthDecorators:
         assert 'user' in data
         assert data['user']['username'] == 'testuser'
     
-    def test_require_auth_with_inactive_user(self, client, database, test_app):
+    def test_require_auth_with_inactive_user(self, client, database):
         """测试非活跃用户认证"""
         # 创建非活跃用户
         user = User(
@@ -222,49 +182,49 @@ class TestAuthDecorators:
             # 应该返回 401 因为用户非活跃
             assert response.status_code == 401
     
-    def test_admin_only_with_regular_user(self, auth_client, test_app):
+    def test_admin_only_with_regular_user(self, auth_client):
         """测试普通用户访问管理员接口"""
         response = auth_client.get('/api/test/admin-only')
         assert response.status_code == 403
         data = response.get_json()
         assert data['error'] == 'permission_denied'
     
-    def test_admin_only_with_admin(self, admin_client, test_app):
+    def test_admin_only_with_admin(self, admin_client):
         """测试管理员访问管理员接口"""
         response = admin_client.get('/api/test/admin-only')
         assert response.status_code == 200
         data = response.get_json()
         assert data['message'] == 'Admin access granted'
     
-    def test_super_admin_only_with_admin(self, admin_client, test_app):
+    def test_super_admin_only_with_admin(self, admin_client):
         """测试管理员访问超级管理员接口"""
         response = admin_client.get('/api/test/super-admin-only')
         assert response.status_code == 403
         data = response.get_json()
         assert data['error'] == 'permission_denied'
     
-    def test_role_check_with_valid_roles(self, auth_client, test_app):
+    def test_role_check_with_valid_roles(self, auth_client):
         """测试角色检查（user 角色允许）"""
         response = auth_client.get('/api/test/role-check')
         assert response.status_code == 200
         data = response.get_json()
         assert data['message'] == 'User or admin access granted'
     
-    def test_role_check_with_admin(self, admin_client, test_app):
+    def test_role_check_with_admin(self, admin_client):
         """测试角色检查（admin 角色允许）"""
         response = admin_client.get('/api/test/role-check')
         assert response.status_code == 200
         data = response.get_json()
         assert data['message'] == 'User or admin access granted'
     
-    def test_optional_auth_without_token(self, client, test_app):
+    def test_optional_auth_without_token(self, client):
         """测试可选认证（无 token）"""
         response = client.get('/api/test/optional-auth')
         assert response.status_code == 200
         data = response.get_json()
         assert data['authenticated'] is False
     
-    def test_optional_auth_with_token(self, auth_client, test_app):
+    def test_optional_auth_with_token(self, auth_client):
         """测试可选认证（有 token）"""
         response = auth_client.get('/api/test/optional-auth')
         assert response.status_code == 200
@@ -367,7 +327,7 @@ class TestSecurity:
         assert len(user.password_hash) > len(password)
         assert password not in user.password_hash
     
-    def test_user_cannot_access_admin_without_role(self, auth_client, test_app):
+    def test_user_cannot_access_admin_without_role(self, auth_client):
         """测试用户无法通过伪造访问管理员接口"""
         # 尝试各种方式访问管理员接口
         response = auth_client.get('/api/test/admin-only')
@@ -379,16 +339,3 @@ class TestSecurity:
             headers={'X-Role': 'admin'}
         )
         assert response.status_code == 403
-    
-    @pytest.fixture
-    def test_app(self, app):
-        """创建带有测试路由的应用"""
-        from app.api.deps import register_auth_error_handlers
-        register_auth_error_handlers(app)
-        
-        @app.route('/api/test/admin-only')
-        @require_admin
-        def admin_only():
-            return {'message': 'Admin access granted'}
-        
-        return app
