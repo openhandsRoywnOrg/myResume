@@ -82,6 +82,8 @@ jobs:
           echo "## Debug Output" >> $GITHUB_STEP_SUMMARY
           echo "- has-macro-label: ${{ steps.check-labels.outputs.has-macro-label }}" >> $GITHUB_STEP_SUMMARY
           echo "- RESULT: $RESULT" >> $GITHUB_STEP_SUMMARY
+          echo "- Event name: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Issue labels count: ${{ github.event.issue.labels | size }}" >> $GITHUB_STEP_SUMMARY
 
   setup-repository:
     needs: [check-permissions, check-labels]
