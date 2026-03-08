@@ -91,7 +91,7 @@ jobs:
 
   setup-repository:
     needs: [check-permissions, check-labels]
-    if: always() && needs.check-labels.outputs.has-macro-label == 'true'
+    if: needs.check-labels.outputs.has-macro-label == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Debug - Check input
