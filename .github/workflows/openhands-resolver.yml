@@ -90,13 +90,17 @@ jobs:
           echo "- Label name: ${{ github.event.label.name || 'N/A' }}" >> $GITHUB_STEP_SUMMARY
 
   setup-repository:
-    needs: [check-permissions, check-labels]
-    if: needs.check-labels.outputs.has-macro-label == 'true'
+    needs: check-permissions
+    if: |
+      needs.check-permissions.outputs.should-run == 'true' &&
+      (github.event.label.name == vars.OPENHANDS_MACRO || github.event.label.name == '@openhands-agent')
     runs-on: ubuntu-latest
     steps:
       - name: Debug - Check input
         run: |
-          echo "has-macro-label from needs: ${{ needs.check-labels.outputs.has-macro-label }}"
+          echo "Event name: ${{ github.event_name }}"
+          echo "Label name: ${{ github.event.label.name }}"
+          echo "Macro: ${{ vars.OPENHANDS_MACRO || '@openhands-agent' }}"
       
       - name: Checkout repository with full history
         uses: actions/checkout@v4
