@@ -59,25 +59,28 @@ jobs:
         run: |
           MACRO="${{ vars.OPENHANDS_MACRO || '@openhands-agent' }}"
           
-          # 对于 labeled 事件，直接检查添加的标签
-          if [ "${{ github.event_name }}" = "labeled" ] && [ "${{ github.event.label.name }}" = "$MACRO" ]; then
-            echo "Found macro label via labeled event: $MACRO"
-            echo "has-macro-label=true" >> $GITHUB_OUTPUT
-            exit 0
+          # 对于 labeled 事件，直接检查添加的标签（支持 macro 或 fix-me）
+          if [ "${{ github.event_name }}" = "labeled" ]; then
+            LABEL_NAME="${{ github.event.label.name }}"
+            if [ "$LABEL_NAME" = "$MACRO" ] || [ "$LABEL_NAME" = "fix-me" ] || [ "$LABEL_NAME" = "fix-me-experimental" ]; then
+              echo "Found macro/fix-me label via labeled event: $LABEL_NAME"
+              echo "has-macro-label=true" >> $GITHUB_OUTPUT
+              exit 0
+            fi
           fi
           
-          # 对于其他事件，检查 labels 数组
+          # 对于其他事件，检查 labels 数组（支持 macro 或 fix-me）
           LABELS_JSON="${{ toJSON(github.event.issue.labels) || toJSON(github.event.pull_request.labels) || '[]' }}"
           
-          echo "Looking for macro in labels array: $MACRO"
+          echo "Looking for macro/fix-me in labels array"
           echo "Labels JSON: $LABELS_JSON"
           
-          # 检查是否包含 macro 标签
-          if echo "$LABELS_JSON" | jq -e --arg macro "$MACRO" '.[] | select(.name == $macro)' > /dev/null 2>&1; then
-            echo "Found macro label in array: $MACRO"
+          # 检查是否包含 macro 或 fix-me 标签
+          if echo "$LABELS_JSON" | jq -e --arg macro "$MACRO" '.[] | select(.name == $macro or .name == "fix-me" or .name == "fix-me-experimental")' > /dev/null 2>&1; then
+            echo "Found macro/fix-me label in array"
             echo "has-macro-label=true" >> $GITHUB_OUTPUT
           else
-            echo "Macro label not found: $MACRO"
+            echo "Macro/fix-me label not found"
             echo "has-macro-label=false" >> $GITHUB_OUTPUT
           fi
       
@@ -90,15 +93,10 @@ jobs:
           echo "- Label name: ${{ github.event.label.name || 'N/A' }}" >> $GITHUB_STEP_SUMMARY
 
   setup-repository:
-    needs: check-permissions
+    needs: [check-permissions, check-labels]
     if: |
       needs.check-permissions.outputs.should-run == 'true' &&
-      (
-        github.event.label.name == 'fix-me' ||
-        github.event.label.name == 'fix-me-experimental' ||
-        contains(github.event.issue.labels.*.name, 'fix-me') ||
-        contains(github.event.issue.labels.*.name, 'fix-me-experimental')
-      )
+      needs.check-labels.outputs.has-macro-label == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Debug - Check input
@@ -106,6 +104,7 @@ jobs:
           echo "Event name: ${{ github.event_name }}"
           echo "Label name: ${{ github.event.label.name }}"
           echo "Issue labels: ${{ toJSON(github.event.issue.labels) }}"
+          echo "has-macro-label from check-labels: ${{ needs.check-labels.outputs.has-macro-label }}"
           echo "Macro: ${{ vars.OPENHANDS_MACRO || '@openhands-agent' }}"
       
       - name: Checkout repository with full history
