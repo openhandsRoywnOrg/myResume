@@ -12,7 +12,7 @@
         .layout-container {
             display: grid;
             grid-template-columns: 280px 1fr 240px;
-            grid-template-rows: 64px 1fr auto;
+            grid-template-rows: 64px auto;
             min-height: 100vh;
         }
 
@@ -25,7 +25,8 @@
             padding: 24px 0;
             position: sticky;
             top: 64px;
-            height: calc(100vh - 64px);
+            max-height: calc(100vh - 64px);
+            grid-row: 2;
         }
 
         .tree-nav {
@@ -103,7 +104,8 @@
             overflow-y: auto;
             position: sticky;
             top: 64px;
-            height: calc(100vh - 64px);
+            max-height: calc(100vh - 64px);
+            grid-row: 2;
         }
 
         .toc-container {
@@ -154,7 +156,7 @@
         /* 主内容区 */
         .main-content-wrapper {
             padding: 48px 64px;
-            overflow-y: auto;
+            min-height: calc(100vh - 64px);
         }
 
         .content-article {
