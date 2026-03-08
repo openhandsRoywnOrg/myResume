@@ -47,6 +47,12 @@ jobs:
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
+      - name: Debug - Show event data
+        run: |
+          echo "Event name: ${{ github.event_name }}"
+          echo "Issue labels: ${{ toJSON(github.event.issue.labels) }}"
+          echo "PR labels: ${{ toJSON(github.event.pull_request.labels) }}"
+
       - name: Check if issue/PR has macro label
         id: check-labels
         run: |
@@ -54,6 +60,9 @@ jobs:
           
           # 获取标签列表（支持 issue 和 PR）
           LABELS_JSON="${{ toJSON(github.event.issue.labels) || toJSON(github.event.pull_request.labels) || '[]' }}"
+          
+          echo "Looking for macro: $MACRO"
+          echo "Labels JSON: $LABELS_JSON"
           
           # 检查是否包含 macro 标签
           if echo "$LABELS_JSON" | jq -e --arg macro "$MACRO" '.[] | select(.name == $macro)' > /dev/null 2>&1; then
@@ -63,6 +72,10 @@ jobs:
             echo "Macro label not found: $MACRO"
             echo "has-macro-label=false" >> $GITHUB_OUTPUT
           fi
+      
+      - name: Debug - Show output
+        run: |
+          echo "has-macro-label output: ${{ steps.check-labels.outputs.has-macro-label }}"
 
   setup-repository:
     needs: [check-permissions, check-labels]
