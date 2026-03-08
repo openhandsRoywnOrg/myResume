@@ -61,8 +61,19 @@ jobs:
             echo "has-macro-label=false" >> $GITHUB_OUTPUT
           fi
 
-  call-openhands-resolver:
+  setup-repository:
     needs: [check-permissions, check-labels]
+    if: needs.check-permissions.outputs.should-run == 'true' && needs.check-labels.outputs.has-macro-label == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository with full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 获取完整历史，避免路径幻觉
+          submodules: recursive
+
+  call-openhands-resolver:
+    needs: [check-permissions, check-labels, setup-repository]
     if: needs.check-permissions.outputs.should-run == 'true' && needs.check-labels.outputs.has-macro-label == 'true'
     uses: OpenHands/OpenHands/.github/workflows/openhands-resolver.yml@main
     with:
