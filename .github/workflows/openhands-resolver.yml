@@ -55,6 +55,7 @@ jobs:
 
   call-openhands-resolver:
     needs: [check-permissions, check-labels, setup-repository]
+    if: needs.check-labels.outputs.has-macro-label == 'true'
     uses: OpenHands/OpenHands/.github/workflows/openhands-resolver.yml@main
     with:
       macro: ${{ vars.OPENHANDS_MACRO || '@openhands-agent' }}
