@@ -68,28 +68,28 @@ jobs:
           if echo "$LABELS_JSON" | jq -e --arg macro "$MACRO" '.[] | select(.name == $macro)' > /dev/null 2>&1; then
             echo "Found macro label: $MACRO"
             echo "has-macro-label=true" >> $GITHUB_OUTPUT
-            echo "RESULT=FOUND" >> $GITHUB_ENV
           else
             echo "Macro label not found: $MACRO"
             echo "has-macro-label=false" >> $GITHUB_OUTPUT
-            echo "RESULT=NOT_FOUND" >> $GITHUB_ENV
           fi
       
       - name: Debug - Show output
         run: |
           echo "has-macro-label output: ${{ steps.check-labels.outputs.has-macro-label }}"
-          echo "RESULT env: $RESULT"
           echo "## Debug Output" >> $GITHUB_STEP_SUMMARY
           echo "- has-macro-label: ${{ steps.check-labels.outputs.has-macro-label }}" >> $GITHUB_STEP_SUMMARY
-          echo "- RESULT: $RESULT" >> $GITHUB_STEP_SUMMARY
           echo "- Event name: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
           echo "- Issue labels count: ${{ github.event.issue.labels | size }}" >> $GITHUB_STEP_SUMMARY
 
   setup-repository:
     needs: [check-permissions, check-labels]
-    if: needs.check-labels.outputs.has-macro-label == 'true'
+    if: always() && needs.check-labels.outputs.has-macro-label == 'true'
     runs-on: ubuntu-latest
     steps:
+      - name: Debug - Check input
+        run: |
+          echo "has-macro-label from needs: ${{ needs.check-labels.outputs.has-macro-label }}"
+      
       - name: Checkout repository with full history
         uses: actions/checkout@v4
         with:
