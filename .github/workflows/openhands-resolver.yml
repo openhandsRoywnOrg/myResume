@@ -48,6 +48,16 @@ jobs:
       LLM_MODEL: ${{ vars.LLM_MODEL || 'openai/qwen3.5-plus' }}
       target_branch: ${{ vars.TARGET_BRANCH || 'main' }}
       runner: ${{ vars.TARGET_RUNNER }}
+      # Git 配置：获取完整历史，避免路径幻觉
+      git_fetch_depth: 0
+    env:
+      # 明确指定工作目录，避免路径幻觉
+      WORKSPACE_DIR: ${{ github.workspace }}
+      REPO_PATH: ${{ github.workspace }}
+      SANDBOX_WORKSPACE_DIR: ${{ github.workspace }}
+      # 调试配置
+      DEBUG: ${{ vars.DEBUG || 'false' }}
+      LOG_LEVEL: ${{ vars.LOG_LEVEL || 'info' }}
     secrets:
       PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
       PAT_USERNAME: ${{ secrets.PAT_USERNAME }}
