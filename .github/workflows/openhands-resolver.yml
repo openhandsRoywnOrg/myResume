@@ -72,8 +72,6 @@ jobs:
       LLM_MODEL: ${{ vars.LLM_MODEL || 'openai/qwen3.5-plus' }}
       target_branch: ${{ vars.TARGET_BRANCH || 'main' }}
       runner: ${{ vars.TARGET_RUNNER }}
-      # Git 配置：获取完整历史，避免路径幻觉
-      git_fetch_depth: 0
     secrets:
       PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
       PAT_USERNAME: ${{ secrets.PAT_USERNAME }}
