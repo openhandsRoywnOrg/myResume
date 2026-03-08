@@ -27,10 +27,14 @@ jobs:
         id: check
         run: |
           AUTHOR_ASSOCIATION="${{ github.event.issue.user.author_association || github.event.pull_request.user.author_association || github.event.comment.author_association || github.event.review.author_association }}"
+          echo "Author association: $AUTHOR_ASSOCIATION"
+
+          # Allow OWNER, COLLABORATOR, MEMBER, or empty (for personal repos/trusted environments)
           if [[ "$AUTHOR_ASSOCIATION" == "OWNER" || "$AUTHOR_ASSOCIATION" == "COLLABORATOR" || "$AUTHOR_ASSOCIATION" == "MEMBER" || -z "$AUTHOR_ASSOCIATION" ]]; then
             echo "should-run=true" >> $GITHUB_OUTPUT
           else
             echo "should-run=false" >> $GITHUB_OUTPUT
+            echo "⚠️ User $AUTHOR_ASSOCIATION is not authorized to trigger OpenHands"
           fi
 
   check-labels:
@@ -38,24 +42,81 @@ jobs:
     if: needs.check-permissions.outputs.should-run == 'true'
     runs-on: ubuntu-latest
     outputs:
-      has-macro-label: ${{ github.event.label.name == 'fix-me' || github.event.label.name == 'fix-me-experimental' || contains(github.event.issue.labels.*.name, 'fix-me') || contains(github.event.issue.labels.*.name, 'fix-me-experimental') }}
+      has-macro-label: ${{ steps.check-labels.outputs.has-macro-label }}
     steps:
-      - run: echo "Labels check complete"
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Debug - Show event data
+        run: |
+          echo "Event name: ${{ github.event_name }}"
+          echo "Label name (for labeled event): ${{ github.event.label.name }}"
+          echo "Issue labels: ${{ toJSON(github.event.issue.labels) }}"
+          echo "PR labels: ${{ toJSON(github.event.pull_request.labels) }}"
+
+      - name: Check if issue/PR has macro label
+        id: check-labels
+        run: |
+          MACRO="${{ vars.OPENHANDS_MACRO || '@openhands-agent' }}"
+          
+          # 对于 labeled 事件，直接检查添加的标签
+          if [ "${{ github.event_name }}" = "labeled" ] && [ "${{ github.event.label.name }}" = "$MACRO" ]; then
+            echo "Found macro label via labeled event: $MACRO"
+            echo "has-macro-label=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          # 对于其他事件，检查 labels 数组
+          LABELS_JSON="${{ toJSON(github.event.issue.labels) || toJSON(github.event.pull_request.labels) || '[]' }}"
+          
+          echo "Looking for macro in labels array: $MACRO"
+          echo "Labels JSON: $LABELS_JSON"
+          
+          # 检查是否包含 macro 标签
+          if echo "$LABELS_JSON" | jq -e --arg macro "$MACRO" '.[] | select(.name == $macro)' > /dev/null 2>&1; then
+            echo "Found macro label in array: $MACRO"
+            echo "has-macro-label=true" >> $GITHUB_OUTPUT
+          else
+            echo "Macro label not found: $MACRO"
+            echo "has-macro-label=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Debug - Show output
+        run: |
+          echo "has-macro-label output: ${{ steps.check-labels.outputs.has-macro-label }}"
+          echo "## Debug Output" >> $GITHUB_STEP_SUMMARY
+          echo "- has-macro-label: ${{ steps.check-labels.outputs.has-macro-label }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Event name: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Label name: ${{ github.event.label.name || 'N/A' }}" >> $GITHUB_STEP_SUMMARY
 
   setup-repository:
-    needs: [check-permissions, check-labels]
-    if: needs.check-labels.outputs.has-macro-label == 'true'
+    needs: check-permissions
+    if: |
+      needs.check-permissions.outputs.should-run == 'true' &&
+      (
+        github.event.label.name == 'fix-me' ||
+        github.event.label.name == 'fix-me-experimental' ||
+        contains(github.event.issue.labels.*.name, 'fix-me') ||
+        contains(github.event.issue.labels.*.name, 'fix-me-experimental')
+      )
     runs-on: ubuntu-latest
     steps:
+      - name: Debug - Check input
+        run: |
+          echo "Event name: ${{ github.event_name }}"
+          echo "Label name: ${{ github.event.label.name }}"
+          echo "Issue labels: ${{ toJSON(github.event.issue.labels) }}"
+          echo "Macro: ${{ vars.OPENHANDS_MACRO || '@openhands-agent' }}"
+      
       - name: Checkout repository with full history
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # 获取完整历史，避免路径幻觉
           submodules: recursive
 
   call-openhands-resolver:
-    needs: [check-permissions, check-labels, setup-repository]
-    if: needs.check-labels.outputs.has-macro-label == 'true'
+    needs: [check-permissions, setup-repository]
+    if: success()
     uses: OpenHands/OpenHands/.github/workflows/openhands-resolver.yml@main
     with:
       macro: ${{ vars.OPENHANDS_MACRO || '@openhands-agent' }}
