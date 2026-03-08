@@ -93,13 +93,19 @@ jobs:
     needs: check-permissions
     if: |
       needs.check-permissions.outputs.should-run == 'true' &&
-      (github.event.label.name == vars.OPENHANDS_MACRO || github.event.label.name == '@openhands-agent')
+      (
+        github.event.label.name == 'fix-me' ||
+        github.event.label.name == 'fix-me-experimental' ||
+        contains(github.event.issue.labels.*.name, 'fix-me') ||
+        contains(github.event.issue.labels.*.name, 'fix-me-experimental')
+      )
     runs-on: ubuntu-latest
     steps:
       - name: Debug - Check input
         run: |
           echo "Event name: ${{ github.event_name }}"
           echo "Label name: ${{ github.event.label.name }}"
+          echo "Issue labels: ${{ toJSON(github.event.issue.labels) }}"
           echo "Macro: ${{ vars.OPENHANDS_MACRO || '@openhands-agent' }}"
       
       - name: Checkout repository with full history
