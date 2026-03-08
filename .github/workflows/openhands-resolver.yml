@@ -1,4 +1,4 @@
-name: Resolve Issue with OpenHands
+name: Forward to OpenHands Server
 
 on:
   issues:
@@ -18,48 +18,25 @@ permissions:
   issues: write
 
 jobs:
-  check-permissions:
+  forward-event:
     runs-on: ubuntu-latest
-    outputs:
-      should-run: ${{ steps.check.outputs.should-run }}
     steps:
-      - name: Check if user has permission to trigger
-        id: check
+      - name: Forward to 自建 Webhook 服务器
+        id: webhook
+        env:
+          WEBHOOK_URL: ${{ secrets.OPENHANDS_SERVER_URL }}
+          WEBHOOK_SECRET: ${{ secrets.OPENHANDS_WEBHOOK_SECRET }}
+          GITHUB_EVENT: ${{ github.event_name }}
+          GITHUB_PAYLOAD: ${{ toJSON(github.event) }}
         run: |
-          AUTHOR_ASSOCIATION="${{ github.event.issue.user.author_association || github.event.pull_request.user.author_association || github.event.comment.author_association || github.event.review.author_association }}"
-          echo "Author association: $AUTHOR_ASSOCIATION"
-
-          # Allow OWNER, COLLABORATOR, MEMBER, or empty (for personal repos/trusted environments)
-          if [[ "$AUTHOR_ASSOCIATION" == "OWNER" || "$AUTHOR_ASSOCIATION" == "COLLABORATOR" || "$AUTHOR_ASSOCIATION" == "MEMBER" || -z "$AUTHOR_ASSOCIATION" ]]; then
-            echo "should-run=true" >> $GITHUB_OUTPUT
-          else
-            echo "should-run=false" >> $GITHUB_OUTPUT
-            echo "⚠️ User $AUTHOR_ASSOCIATION is not authorized to trigger OpenHands"
-          fi
-
-  call-openhands-resolver:
-    needs: check-permissions
-    if: needs.check-permissions.outputs.should-run == 'true'
-    uses: OpenHands/OpenHands/.github/workflows/openhands-resolver.yml@main
-    with:
-      macro: ${{ vars.OPENHANDS_MACRO || '@openhands-agent' }}
-      max_iterations: ${{ fromJson(vars.OPENHANDS_MAX_ITER || 50) }}
-      base_container_image: ${{ vars.OPENHANDS_BASE_CONTAINER_IMAGE || '' }}
-      LLM_MODEL: ${{ vars.LLM_MODEL || 'openai/qwen3.5-plus' }}
-      target_branch: ${{ vars.TARGET_BRANCH || 'main' }}
-      runner: ${{ vars.TARGET_RUNNER }}
-      # Git 配置：获取完整历史，避免路径幻觉
-      git_fetch_depth: 0
-    env:
-      # 明确指定工作目录，避免路径幻觉
-      WORKSPACE_DIR: ${{ github.workspace }}
-      REPO_PATH: ${{ github.workspace }}
-      SANDBOX_WORKSPACE_DIR: ${{ github.workspace }}
-      # 调试配置
-      DEBUG: ${{ vars.DEBUG || 'false' }}
-      LOG_LEVEL: ${{ vars.LOG_LEVEL || 'info' }}
-    secrets:
-      PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
-      PAT_USERNAME: ${{ secrets.PAT_USERNAME }}
-      LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
-      LLM_BASE_URL: ${{ secrets.LLM_BASE_URL }}
+          # 计算 HMAC-SHA256 签名
+          SIGNATURE="sha256=$(echo -n "$GITHUB_PAYLOAD" | openssl dgst -sha256 -hmac "$WEBHOOK_SECRET" | awk '{print $2}')"
+          
+          # 发送带签名的请求
+          curl -v -X POST "$WEBHOOK_URL/webhook/github" \
+            -H "Content-Type: application/json" \
+            -H "X-GitHub-Event: $GITHUB_EVENT" \
+            -H "X-Hub-Signature-256: $SIGNATURE" \
+            -d "$GITHUB_PAYLOAD"
+          
+          echo "signature=$SIGNATURE" >> $GITHUB_OUTPUT
