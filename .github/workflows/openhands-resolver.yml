@@ -79,10 +79,7 @@ jobs:
 
   setup-repository:
     needs: [check-permissions, check-labels]
-    if: |
-      needs.check-permissions.outputs.should-run == 'true' &&
-      needs.check-labels.outputs.has-macro-label == 'true' &&
-      success()
+    if: needs.check-labels.outputs.has-macro-label == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository with full history
@@ -93,10 +90,7 @@ jobs:
 
   call-openhands-resolver:
     needs: [check-permissions, check-labels, setup-repository]
-    if: |
-      needs.check-permissions.outputs.should-run == 'true' && 
-      needs.check-labels.outputs.has-macro-label == 'true' &&
-      success()
+    if: success()
     uses: OpenHands/OpenHands/.github/workflows/openhands-resolver.yml@main
     with:
       macro: ${{ vars.OPENHANDS_MACRO || '@openhands-agent' }}
