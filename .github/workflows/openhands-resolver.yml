@@ -38,9 +38,47 @@ jobs:
     if: needs.check-permissions.outputs.should-run == 'true'
     runs-on: ubuntu-latest
     outputs:
-      has-macro-label: ${{ github.event.label.name == 'fix-me' || github.event.label.name == 'fix-me-experimental' || contains(github.event.issue.labels.*.name, 'fix-me') || contains(github.event.issue.labels.*.name, 'fix-me-experimental') }}
+      has-macro-label: ${{ steps.check-labels.outputs.has-macro-label }}
     steps:
-      - run: echo "Labels check complete"
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Check if issue/PR has fix-me label
+        id: check-labels
+        run: |
+          echo "Event name: ${{ github.event_name }}"
+
+          # For labeled event, check the added label directly
+          if [ "${{ github.event_name }}" = "labeled" ]; then
+            LABEL_NAME="${{ github.event.label.name }}"
+            echo "Labeled event, label name: $LABEL_NAME"
+            if [ "$LABEL_NAME" = "fix-me" ] || [ "$LABEL_NAME" = "fix-me-experimental" ]; then
+              echo "has-macro-label=true" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+          fi
+
+          # For opened/reopened events, github.event.issue.labels should be available
+          if [ "${{ github.event_name }}" = "opened" ] || [ "${{ github.event_name }}" = "reopened" ]; then
+            LABELS_JSON='${{ toJSON(github.event.issue.labels) }}'
+            echo "Opened event, labels JSON: $LABELS_JSON"
+            if echo "$LABELS_JSON" | jq -e '.[] | select(.name == "fix-me" or .name == "fix-me-experimental")' > /dev/null 2>&1; then
+              echo "has-macro-label=true" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+          fi
+
+          # For PR events
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            LABELS_JSON='${{ toJSON(github.event.pull_request.labels) }}'
+            echo "PR event, labels JSON: $LABELS_JSON"
+            if echo "$LABELS_JSON" | jq -e '.[] | select(.name == "fix-me" or .name == "fix-me-experimental")' > /dev/null 2>&1; then
+              echo "has-macro-label=true" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+          fi
+
+          echo "has-macro-label=false" >> $GITHUB_OUTPUT
 
   setup-repository:
     needs: [check-permissions, check-labels]
