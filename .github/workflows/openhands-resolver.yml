@@ -38,47 +38,9 @@ jobs:
     if: needs.check-permissions.outputs.should-run == 'true'
     runs-on: ubuntu-latest
     outputs:
-      has-macro-label: ${{ steps.check-labels.outputs.has-macro-label }}
+      has-macro-label: ${{ github.event.label.name == 'fix-me' || github.event.label.name == 'fix-me-experimental' || contains(github.event.issue.labels.*.name, 'fix-me') || contains(github.event.issue.labels.*.name, 'fix-me-experimental') }}
     steps:
-      - name: Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
-
-      - name: Check if issue/PR has fix-me label
-        id: check-labels
-        run: |
-          echo "Event name: ${{ github.event_name }}"
-          
-          # 对于 labeled 事件，直接检查添加的标签
-          if [ "${{ github.event_name }}" = "labeled" ]; then
-            LABEL_NAME="${{ github.event.label.name }}"
-            echo "Labeled event, label name: $LABEL_NAME"
-            if [ "$LABEL_NAME" = "fix-me" ] || [ "$LABEL_NAME" = "fix-me-experimental" ]; then
-              echo "has-macro-label=true" >> $GITHUB_OUTPUT
-              exit 0
-            fi
-          fi
-          
-          # 对于 opened/reopened 事件，github.event.issue.labels 应该可用
-          if [ "${{ github.event_name }}" = "opened" ] || [ "${{ github.event_name }}" = "reopened" ]; then
-            LABELS_JSON='${{ toJSON(github.event.issue.labels) }}'
-            echo "Opened event, labels JSON: $LABELS_JSON"
-            if echo "$LABELS_JSON" | jq -e '.[] | select(.name == "fix-me" or .name == "fix-me-experimental")' > /dev/null 2>&1; then
-              echo "has-macro-label=true" >> $GITHUB_OUTPUT
-              exit 0
-            fi
-          fi
-          
-          # 对于 PR 事件
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            LABELS_JSON='${{ toJSON(github.event.pull_request.labels) }}'
-            echo "PR event, labels JSON: $LABELS_JSON"
-            if echo "$LABELS_JSON" | jq -e '.[] | select(.name == "fix-me" or .name == "fix-me-experimental")' > /dev/null 2>&1; then
-              echo "has-macro-label=true" >> $GITHUB_OUTPUT
-              exit 0
-            fi
-          fi
-          
-          echo "has-macro-label=false" >> $GITHUB_OUTPUT
+      - run: echo "Labels check complete"
 
   setup-repository:
     needs: [check-permissions, check-labels]
