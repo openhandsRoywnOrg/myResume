@@ -50,6 +50,7 @@ jobs:
       - name: Debug - Show event data
         run: |
           echo "Event name: ${{ github.event_name }}"
+          echo "Label name (for labeled event): ${{ github.event.label.name }}"
           echo "Issue labels: ${{ toJSON(github.event.issue.labels) }}"
           echo "PR labels: ${{ toJSON(github.event.pull_request.labels) }}"
 
@@ -58,15 +59,22 @@ jobs:
         run: |
           MACRO="${{ vars.OPENHANDS_MACRO || '@openhands-agent' }}"
           
-          # 获取标签列表（支持 issue 和 PR）
+          # 对于 labeled 事件，直接检查添加的标签
+          if [ "${{ github.event_name }}" = "labeled" ] && [ "${{ github.event.label.name }}" = "$MACRO" ]; then
+            echo "Found macro label via labeled event: $MACRO"
+            echo "has-macro-label=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          # 对于其他事件，检查 labels 数组
           LABELS_JSON="${{ toJSON(github.event.issue.labels) || toJSON(github.event.pull_request.labels) || '[]' }}"
           
-          echo "Looking for macro: $MACRO"
+          echo "Looking for macro in labels array: $MACRO"
           echo "Labels JSON: $LABELS_JSON"
           
           # 检查是否包含 macro 标签
           if echo "$LABELS_JSON" | jq -e --arg macro "$MACRO" '.[] | select(.name == $macro)' > /dev/null 2>&1; then
-            echo "Found macro label: $MACRO"
+            echo "Found macro label in array: $MACRO"
             echo "has-macro-label=true" >> $GITHUB_OUTPUT
           else
             echo "Macro label not found: $MACRO"
@@ -79,7 +87,7 @@ jobs:
           echo "## Debug Output" >> $GITHUB_STEP_SUMMARY
           echo "- has-macro-label: ${{ steps.check-labels.outputs.has-macro-label }}" >> $GITHUB_STEP_SUMMARY
           echo "- Event name: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Issue labels count: ${{ github.event.issue.labels || 'N/A' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Label name: ${{ github.event.label.name || 'N/A' }}" >> $GITHUB_STEP_SUMMARY
 
   setup-repository:
     needs: [check-permissions, check-labels]
