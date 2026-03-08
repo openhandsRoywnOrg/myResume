@@ -68,14 +68,20 @@ jobs:
           if echo "$LABELS_JSON" | jq -e --arg macro "$MACRO" '.[] | select(.name == $macro)' > /dev/null 2>&1; then
             echo "Found macro label: $MACRO"
             echo "has-macro-label=true" >> $GITHUB_OUTPUT
+            echo "RESULT=FOUND" >> $GITHUB_ENV
           else
             echo "Macro label not found: $MACRO"
             echo "has-macro-label=false" >> $GITHUB_OUTPUT
+            echo "RESULT=NOT_FOUND" >> $GITHUB_ENV
           fi
       
       - name: Debug - Show output
         run: |
           echo "has-macro-label output: ${{ steps.check-labels.outputs.has-macro-label }}"
+          echo "RESULT env: $RESULT"
+          echo "## Debug Output" >> $GITHUB_STEP_SUMMARY
+          echo "- has-macro-label: ${{ steps.check-labels.outputs.has-macro-label }}" >> $GITHUB_STEP_SUMMARY
+          echo "- RESULT: $RESULT" >> $GITHUB_STEP_SUMMARY
 
   setup-repository:
     needs: [check-permissions, check-labels]
