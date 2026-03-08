@@ -90,15 +90,8 @@ jobs:
           echo "- Label name: ${{ github.event.label.name || 'N/A' }}" >> $GITHUB_STEP_SUMMARY
 
   setup-repository:
-    needs: check-permissions
-    if: |
-      needs.check-permissions.outputs.should-run == 'true' &&
-      (
-        github.event.label.name == 'fix-me' ||
-        github.event.label.name == 'fix-me-experimental' ||
-        contains(github.event.issue.labels.*.name, 'fix-me') ||
-        contains(github.event.issue.labels.*.name, 'fix-me-experimental')
-      )
+    needs: [check-permissions, check-labels]
+    if: needs.check-labels.outputs.has-macro-label == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Debug - Check input
