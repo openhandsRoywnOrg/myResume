@@ -4,255 +4,569 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ topic }} - AI 运维开发面试知识总结</title>
+    <title>{{ topic }} - AI DevOps Pro</title>
     <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
-        .mindmap-container {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
-            overflow-x: auto;
+        /* 三栏布局 */
+        .layout-container {
+            display: grid;
+            grid-template-columns: 280px 1fr 240px;
+            grid-template-rows: 64px 1fr auto;
+            min-height: 100vh;
         }
 
-        .mindmap-container h2 {
-            color: #667eea;
-            margin-bottom: 20px;
-            text-align: center;
+        /* 左侧导航 */
+        .left-sidebar {
+            width: 280px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            padding: 24px 0;
+            position: sticky;
+            top: 64px;
+            height: calc(100vh - 64px);
         }
 
-        .mindmap {
+        .tree-nav {
+            font-size: 14px;
+        }
+
+        .nav-section-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-tree {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .tree-node {
             position: relative;
-            min-height: 400px;
-            padding: 20px;
         }
 
-        .mindmap-node {
-            position: relative;
-            display: inline-block;
-            margin: 10px;
-            padding: 12px 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            font-weight: 500;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        .mindmap-node:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        }
-
-        .mindmap-node.root {
-            font-size: 1.3em;
-            padding: 15px 30px;
-            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-        }
-
-        .mindmap-node.level-1 {
-            font-size: 1.1em;
-            background: linear-gradient(135deg, #667eea 0%, #5a67d8 100%);
-        }
-
-        .mindmap-node.level-2 {
-            font-size: 0.95em;
-            background: linear-gradient(135deg, #5a67d8 0%, #4c51bf 100%);
-        }
-
-        .mindmap-node.level-3 {
-            font-size: 0.85em;
-            background: linear-gradient(135deg, #4c51bf 0%, #434190 100%);
-        }
-
-        .mindmap-children {
-            position: relative;
-            padding-left: 30px;
-            margin-left: 20px;
-            border-left: 2px solid #667eea;
-        }
-
-        .mindmap-node.collapsed + .mindmap-children {
-            display: none;
-        }
-
-        .toggle-btn {
+        .node-toggle {
             position: absolute;
-            right: -20px;
+            left: 8px;
             top: 50%;
             transform: translateY(-50%);
             width: 20px;
             height: 20px;
-            background: #667eea;
-            color: white;
-            border-radius: 50%;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            color: var(--text-secondary);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
-            cursor: pointer;
-            user-select: none;
+            font-size: 12px;
         }
 
-        .toggle-btn:hover {
-            background: #5a67d8;
+        .node-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px 10px 40px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s;
         }
 
-        .mindmap-node.collapsed .toggle-btn::after {
-            content: '+';
+        .node-link:hover {
+            background: var(--card-bg);
+            color: var(--text-primary);
         }
 
-        .mindmap-node:not(.collapsed) .toggle-btn::after {
-            content: '−';
+        .node-link.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .node-icon {
+            font-size: 16px;
+        }
+
+        /* 右侧目录 */
+        .right-sidebar {
+            width: 240px;
+            padding: 24px 16px;
+            border-left: 1px solid var(--border-color);
+            overflow-y: auto;
+            position: sticky;
+            top: 64px;
+            height: calc(100vh - 64px);
+        }
+
+        .toc-container {
+            font-size: 13px;
+        }
+
+        .toc-header {
+            padding: 8px 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+
+        .toc-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .toc-item {
+            margin: 4px 0;
+        }
+
+        .toc-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .toc-link:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .toc-link.active {
+            background: var(--bg-secondary);
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        /* 主内容区 */
+        .main-content-wrapper {
+            padding: 48px 64px;
+            overflow-y: auto;
+        }
+
+        .content-article {
+            max-width: 900px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        .article-header {
+            margin-bottom: 48px;
+            padding-bottom: 24px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .article-header h1 {
+            font-size: 42px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0 0 16px 0;
+            line-height: 1.2;
+        }
+
+        .meta-info {
+            display: flex;
+            gap: 24px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 16px;
+        }
+
+        .content-section {
+            margin: 48px 0;
+            scroll-margin-top: 24px;
+        }
+
+        .content-section h2 {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0 0 24px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .anchor-link {
+            opacity: 0;
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: opacity 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .content-section h2:hover .anchor-link {
+            opacity: 1;
+        }
+
+        .anchor-link .material-icons {
+            font-size: 18px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 1200px) {
+            .layout-container {
+                grid-template-columns: 240px 1fr;
+            }
+            .right-sidebar {
+                display: none;
+            }
         }
 
         @media (max-width: 768px) {
-            .mindmap-container {
-                padding: 15px;
+            .layout-container {
+                grid-template-columns: 1fr;
             }
-
-            .mindmap-node {
-                padding: 8px 15px;
-                font-size: 0.9em;
+            .left-sidebar {
+                display: none;
             }
-
-            .mindmap-node.root {
-                padding: 12px 20px;
+            .main-content-wrapper {
+                padding: 24px 16px;
+            }
+            .article-header h1 {
+                font-size: 28px;
             }
         }
     </style>
 </head>
 <body>
-    <!-- 导航栏 -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <ul class="nav-menu">
-                <li class="nav-item dropdown">
-                    <a href="javascript:void(0)" class="nav-link" onclick="toggleDropdown(event, 'linux-dropdown')">
-                        Linux <span class="dropdown-arrow">▼</span>
-                    </a>
-                    <ul class="dropdown-menu" id="linux-dropdown">
-                        <li><a href="/topic/linux/linux-basics">Linux 基础</a></li>
-                        <li><a href="/topic/linux/linux-networking">Linux 网络配置</a></li>
-                    </ul>
-                </li>
-                <li class="nav-item dropdown">
-                    <a href="javascript:void(0)" class="nav-link" onclick="toggleDropdown(event, 'docker-dropdown')">
-                        Docker <span class="dropdown-arrow">▼</span>
-                    </a>
-                    <ul class="dropdown-menu" id="docker-dropdown">
-                        <li><a href="/topic/docker/docker-basics">Docker 基础</a></li>
-                        <li><a href="/topic/docker/docker-compose">Docker Compose</a></li>
-                    </ul>
-                </li>
-                <li class="nav-item dropdown">
-                    <a href="javascript:void(0)" class="nav-link" onclick="toggleDropdown(event, 'k8s-dropdown')">
-                        K8s <span class="dropdown-arrow">▼</span>
-                    </a>
-                    <ul class="dropdown-menu" id="k8s-dropdown">
-                        <li><a href="/topic/k8s/k8s-basics">Kubernetes 基础</a></li>
-                    </ul>
-                </li>
-            </ul>
+    <!-- 全局导航栏 -->
+    <header class="navbar-pro">
+        <div class="nav-brand">
+            <span class="logo">🤖⚙️</span>
+            <span>AI DevOps Pro</span>
         </div>
-    </nav>
+        <div class="nav-search">
+            <input type="text" placeholder="Search knowledge base...">
+            <button class="search-btn">
+                <span class="material-icons">search</span>
+            </button>
+        </div>
+        <div class="nav-actions">
+            <button class="theme-toggle" id="themeToggle">
+                <span class="material-icons">dark_mode</span>
+            </button>
+        </div>
+    </header>
 
-    <div class="container">
-        <header class="page-header">
-            <h1>🤖 AI 运维开发面试知识总结</h1>
-            <nav class="breadcrumb">
-                <a href="/">首页</a> &gt;
-                <a href="/#{{ category }}">{{ category }}</a> &gt;
-                <span>{{ topic }}</span>
-            </nav>
-        </header>
-
-        <main class="topic-content">
-            <!-- Mind Map Section -->
-            <div class="mindmap-container">
-                <h2>📊 知识点思维导图</h2>
-                <div class="mindmap" id="mindmap">
-                    <!-- Mind map will be rendered here -->
+    <!-- 三栏布局 -->
+    <div class="layout-container">
+        <!-- 左侧树状导航 -->
+        <aside class="left-sidebar">
+            <nav class="tree-nav">
+                <div class="nav-section">
+                    <div class="nav-section-header">
+                        <span class="material-icons">folder</span>
+                        <span>{{ category }}</span>
+                    </div>
+                    <ul class="nav-tree" id="leftNavTree">
+                        <!-- 由 JavaScript 动态生成 -->
+                    </ul>
                 </div>
-            </div>
+            </nav>
+        </aside>
 
-            <article>
-                <h1 class="topic-title">{{ topic }}</h1>
-                {{ content|safe }}
+        <!-- 主内容区 -->
+        <main class="main-content-wrapper">
+            <article class="content-article">
+                <header class="article-header">
+                    <h1>{{ topic }}</h1>
+                    <div class="meta-info">
+                        <span>
+                            <span class="material-icons" style="font-size: 14px; vertical-align: middle;">update</span>
+                            Last updated: 2025-03-03
+                        </span>
+                        <span>
+                            <span class="material-icons" style="font-size: 14px; vertical-align: middle;">visibility</span>
+                            <span id="viewCount">-</span> views
+                        </span>
+                    </div>
+                </header>
+
+                <!-- 思维导图 -->
+                <div class="mindmap-container" style="background: var(--card-bg); padding: 30px; border-radius: 12px; box-shadow: 0 2px 8px var(--card-shadow); margin-bottom: 30px; overflow-x: auto;">
+                    <h2 style="color: var(--primary-color); margin-bottom: 20px; text-align: center;">📊 知识点思维导图</h2>
+                    <div class="mindmap" id="mindmap" style="position: relative; min-height: 300px; padding: 20px;"></div>
+                </div>
+
+                <!-- 动态内容区 -->
+                <div id="contentBody">
+                    {{ content|safe }}
+                </div>
+
+                <div class="back-link" style="margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border-color); display: flex; gap: 16px;">
+                    <a href="/" style="color: var(--primary-color); text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                        <span class="material-icons">arrow_back</span>
+                        返回首页
+                    </a>
+                    <a href="/#{{ category }}" style="color: var(--primary-color); text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                        <span class="material-icons">arrow_back</span>
+                        返回 {{ category }}
+                    </a>
+                </div>
             </article>
-
-            <div class="back-link">
-                <a href="/">← 返回首页</a>
-            </div>
         </main>
 
-        <footer>
-            <p>AI 运维开发面试知识总结 | 参照 <a href="https://www.mianshiya.com/" target="_blank">面试导航</a> 风格</p>
-        </footer>
+        <!-- 右侧目录导航 -->
+        <aside class="right-sidebar">
+            <div class="toc-container">
+                <div class="toc-header">On this page</div>
+                <nav class="toc-nav">
+                    <ul class="toc-list" id="tocList">
+                        <!-- 由 JavaScript 动态生成 -->
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+    </div>
+
+    <!-- AI 助手悬浮按钮 -->
+    <div class="ai-assistant-widget" style="position: fixed; bottom: 24px; right: 24px; z-index: 2000;">
+        <button class="ai-chat-toggle" id="aiChatToggle" style="width: 56px; height: 56px; border-radius: 50%; border: none; background: var(--primary-gradient); color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); transition: transform 0.2s, box-shadow 0.2s;">
+            <span class="material-icons">spark</span>
+        </button>
     </div>
 
     <script>
-        // 切换下拉菜单
-        function toggleDropdown(event, dropdownId) {
-            event.preventDefault();
-            event.stopPropagation();
+        // 主题切换
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('click', function() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            this.querySelector('.material-icons').textContent = 
+                newTheme === 'dark' ? 'light_mode' : 'dark_mode';
+        });
 
-            // 关闭所有其他下拉菜单
-            const allDropdowns = document.querySelectorAll('.dropdown-menu');
-            allDropdowns.forEach(dropdown => {
-                if (dropdown.id !== dropdownId) {
-                    dropdown.classList.remove('show');
-                }
-            });
-
-            // 切换当前下拉菜单
-            const dropdown = document.getElementById(dropdownId);
-            dropdown.classList.toggle('show');
+        // 初始化主题
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        if (themeToggle) {
+            themeToggle.querySelector('.material-icons').textContent = 
+                savedTheme === 'dark' ? 'light_mode' : 'dark_mode';
         }
 
-        // 点击外部关闭下拉菜单
-        document.addEventListener('click', function(event) {
-            const dropdowns = document.querySelectorAll('.dropdown-menu');
-            dropdowns.forEach(dropdown => {
-                if (!dropdown.contains(event.target)) {
-                    dropdown.classList.remove('show');
+        // 生成右侧目录
+        function generateTOC() {
+            const contentBody = document.getElementById('contentBody');
+            if (!contentBody) return;
+
+            const headings = contentBody.querySelectorAll('h1, h2, h3');
+            const tocList = document.getElementById('tocList');
+            
+            if (!tocList || headings.length === 0) return;
+
+            headings.forEach((heading, index) => {
+                // 为每个标题添加 ID（如果没有）
+                if (!heading.id) {
+                    heading.id = `section-${index}`;
+                }
+
+                // 添加锚点链接
+                const anchorLink = document.createElement('a');
+                anchorLink.href = `#${heading.id}`;
+                anchorLink.className = 'anchor-link';
+                anchorLink.innerHTML = '<span class="material-icons" style="font-size: 18px;">link</span>';
+                anchorLink.style.opacity = '0';
+                anchorLink.style.marginLeft = '12px';
+                anchorLink.style.textDecoration = 'none';
+                anchorLink.style.color = 'var(--primary-color)';
+                heading.appendChild(anchorLink);
+
+                // 添加目录项
+                const li = document.createElement('li');
+                li.className = 'toc-item';
+                
+                const link = document.createElement('a');
+                link.href = `#${heading.id}`;
+                link.className = 'toc-link';
+                link.textContent = heading.textContent.replace('link', '').trim();
+                
+                // 根据标题级别设置缩进
+                if (heading.tagName === 'H2') {
+                    link.style.paddingLeft = '12px';
+                } else if (heading.tagName === 'H3') {
+                    link.style.paddingLeft = '24px';
+                }
+                
+                li.appendChild(link);
+                tocList.appendChild(li);
+            });
+        }
+
+        // 滚动高亮
+        function initScrollSpy() {
+            const sections = document.querySelectorAll('.content-section[id], #contentBody h1[id], #contentBody h2[id], #contentBody h3[id]');
+            const tocLinks = document.querySelectorAll('.toc-link');
+
+            const observer = new IntersectionObserver(
+                entries => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const id = entry.target.id;
+                            tocLinks.forEach(link => {
+                                link.classList.remove('active');
+                                if (link.getAttribute('href') === `#${id}`) {
+                                    link.classList.add('active');
+                                }
+                            });
+                        }
+                    });
+                },
+                { rootMargin: '-100px 0px -60% 0px' }
+            );
+
+            sections.forEach(section => observer.observe(section));
+        }
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                if (href !== '#' && href.length > 1) {
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
                 }
             });
         });
 
-        // 阻止事件冒泡
-        document.querySelectorAll('.dropdown-menu').forEach(dropdown => {
-            dropdown.addEventListener('click', function(event) {
-                event.stopPropagation();
-            });
-        });
+        // 左侧导航树（示例数据）
+        function initLeftNav() {
+            const navTree = document.getElementById('leftNavTree');
+            if (!navTree) return;
 
-        // Mind map data from server
+            // 这里可以从服务器获取真实的导航数据
+            const sampleNavData = [
+                { text: '概述', icon: 'description', link: '#overview', children: [] },
+                { text: '核心概念', icon: 'lightbulb', link: '#concepts', children: [
+                    { text: '基本概念', link: '#basic-concepts' },
+                    { text: '高级概念', link: '#advanced-concepts' }
+                ]},
+                { text: '实践指南', icon: 'build', link: '#guide', children: [] },
+                { text: '最佳实践', icon: 'star', link: '#best-practices', children: [] },
+                { text: '常见问题', icon: 'help', link: '#faq', children: [] }
+            ];
+
+            function renderTreeNode(node, level = 0) {
+                const li = document.createElement('li');
+                li.className = 'tree-node';
+
+                const link = document.createElement('a');
+                link.href = node.link;
+                link.className = 'node-link';
+                
+                const icon = document.createElement('span');
+                icon.className = 'material-icons node-icon';
+                icon.textContent = node.icon || 'article';
+                
+                const label = document.createElement('span');
+                label.textContent = node.text;
+                
+                link.appendChild(icon);
+                link.appendChild(label);
+
+                if (node.children && node.children.length > 0) {
+                    const toggle = document.createElement('button');
+                    toggle.className = 'node-toggle';
+                    toggle.innerHTML = '▶';
+                    toggle.setAttribute('aria-expanded', 'false');
+                    
+                    toggle.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+                        toggle.setAttribute('aria-expanded', !isExpanded);
+                        toggle.textContent = isExpanded ? '▶' : '▼';
+                        
+                        const subTree = li.querySelector('.nav-tree-sub');
+                        if (subTree) {
+                            subTree.style.display = isExpanded ? 'none' : 'block';
+                        }
+                    });
+                    
+                    li.insertBefore(toggle, link);
+                    link.style.paddingLeft = '40px';
+                }
+
+                li.appendChild(link);
+
+                if (node.children && node.children.length > 0) {
+                    const subTree = document.createElement('ul');
+                    subTree.className = 'nav-tree-sub';
+                    subTree.style.display = 'none';
+                    
+                    node.children.forEach(child => {
+                        const subLi = document.createElement('li');
+                        subLi.className = 'tree-node-sub';
+                        
+                        const subLink = document.createElement('a');
+                        subLink.href = child.link;
+                        subLink.className = 'node-link';
+                        subLink.style.paddingLeft = '56px';
+                        subLink.textContent = child.text;
+                        
+                        subLi.appendChild(subLink);
+                        subTree.appendChild(subLi);
+                    });
+                    
+                    li.appendChild(subTree);
+                }
+
+                return li;
+            }
+
+            sampleNavData.forEach(node => {
+                navTree.appendChild(renderTreeNode(node));
+            });
+        }
+
+        // 思维导图渲染（保留原有功能）
         const mindmapData = {{ mindmap_data|tojson }};
 
-        // Render mind map recursively
         function renderNode(node, level = 0) {
             const nodeDiv = document.createElement('div');
             nodeDiv.className = 'mindmap-node-wrapper';
 
             const nodeLink = document.createElement('a');
-            nodeLink.href = node.link;
+            nodeLink.href = node.link || 'javascript:void(0)';
             nodeLink.className = `mindmap-node ${level === 0 ? 'root' : 'level-' + Math.min(level, 3)}`;
             nodeLink.textContent = node.text;
 
             if (node.children && node.children.length > 0) {
                 const toggleBtn = document.createElement('span');
                 toggleBtn.className = 'toggle-btn';
+                toggleBtn.textContent = '−';
                 nodeLink.appendChild(toggleBtn);
 
                 nodeLink.addEventListener('click', function(e) {
                     if (e.target === toggleBtn || e.target.parentNode === nodeLink) {
                         e.preventDefault();
+                        e.stopPropagation();
                         nodeLink.classList.toggle('collapsed');
+                        toggleBtn.textContent = nodeLink.classList.contains('collapsed') ? '+' : '−';
                     }
                 });
             }
@@ -273,13 +587,109 @@
             return nodeDiv;
         }
 
-        // Initialize mind map
+        // 初始化
         document.addEventListener('DOMContentLoaded', function() {
+            // 生成目录
+            generateTOC();
+            
+            // 初始化滚动监听
+            setTimeout(initScrollSpy, 100);
+            
+            // 初始化左侧导航
+            initLeftNav();
+            
+            // 初始化思维导图
             const mindmapContainer = document.getElementById('mindmap');
-            if (mindmapData) {
+            if (mindmapContainer && mindmapData) {
                 mindmapContainer.appendChild(renderNode(mindmapData));
             }
+
+            // 模拟访问计数
+            const viewCountEl = document.getElementById('viewCount');
+            if (viewCountEl) {
+                const randomViews = Math.floor(Math.random() * 500) + 100;
+                viewCountEl.textContent = randomViews;
+            }
         });
+
+        // 添加思维导图样式
+        const style = document.createElement('style');
+        style.textContent = `
+            .mindmap-node {
+                position: relative;
+                display: inline-block;
+                margin: 10px;
+                padding: 12px 20px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                border-radius: 25px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                text-decoration: none;
+                font-weight: 500;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            }
+
+            .mindmap-node:hover {
+                transform: scale(1.05);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            }
+
+            .mindmap-node.root {
+                font-size: 1.3em;
+                padding: 15px 30px;
+                background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            }
+
+            .mindmap-node.level-1 {
+                font-size: 1.1em;
+                background: linear-gradient(135deg, #667eea 0%, #5a67d8 100%);
+            }
+
+            .mindmap-node.level-2 {
+                font-size: 0.95em;
+                background: linear-gradient(135deg, #5a67d8 0%, #4c51bf 100%);
+            }
+
+            .mindmap-node.level-3 {
+                font-size: 0.85em;
+                background: linear-gradient(135deg, #4c51bf 0%, #434190 100%);
+            }
+
+            .mindmap-children {
+                position: relative;
+                padding-left: 30px;
+                margin-left: 20px;
+                border-left: 2px solid #667eea;
+            }
+
+            .mindmap-node.collapsed + .mindmap-children {
+                display: none;
+            }
+
+            .toggle-btn {
+                position: absolute;
+                right: -20px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 20px;
+                height: 20px;
+                background: #667eea;
+                color: white;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 14px;
+                cursor: pointer;
+                user-select: none;
+            }
+
+            .toggle-btn:hover {
+                background: #5a67d8;
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
