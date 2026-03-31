@@ -95,7 +95,15 @@ def topic(category, topic):
     content = read_markdown_file(category, topic)
     mindmap_data = extract_mindmap_data(category, topic)
     if content:
-        return render_template('topic.html', content=content, topic=topic.replace('-', ' ').title(), category=category.replace('-', ' ').title(), mindmap_data=mindmap_data)
+        return render_template(
+            'topic.html',
+            content=content,
+            topic=topic.replace('-', ' ').title(),
+            topic_id=topic,
+            category=category.replace('-', ' ').title(),
+            category_id=category,
+            mindmap_data=mindmap_data,
+        )
     return 'Topic not found', 404
 
 @app.route('/api/mindmap/<category>/<topic>')

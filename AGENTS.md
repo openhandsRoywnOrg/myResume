@@ -31,6 +31,14 @@
 
 详细进展查看：[项目进展报告](docs/PROJECT_PROGRESS.md)
 
+## 🧠 Repository Memory
+
+- `/topic/<category>/<topic>` 页面由 `ai-ops-interview/templates/topic.html` 渲染，不是 `content_page.html`。
+- Topic 页正文来自 Markdown，并启用了 `markdown` 的 `extra`、`codehilite`、`toc` 扩展，因此样式必须覆盖表格、目录、代码块、列表、blockquote 等结构。
+- Topic 页已统一到新版四大导航风格，并使用 `.topic-*` 作用域样式；如果后续继续优化内容页，优先复用 `style.css` 中的共享导航与 `.topic-markdown` 版式规则。
+- Topic 页的思维导图是辅助模块，默认收起，位于侧栏 `#topic-mindmap-panel`，不要再恢复为正文前置的大块首屏模块。
+
+
 ## 🏗️ 项目架构
 
 ### 目录结构
