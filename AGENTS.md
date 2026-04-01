@@ -37,6 +37,13 @@
 - Topic 页正文来自 Markdown，并启用了 `markdown` 的 `extra`、`codehilite`、`toc` 扩展，因此样式必须覆盖表格、目录、代码块、列表、blockquote 等结构。
 - Topic 页已统一到新版四大导航风格，并使用 `.topic-*` 作用域样式；如果后续继续优化内容页，优先复用 `style.css` 中的共享导航与 `.topic-markdown` 版式规则。
 - Topic 页的思维导图是辅助模块，默认收起，位于侧栏 `#topic-mindmap-panel`，不要再恢复为正文前置的大块首屏模块。
+- 首页 `templates/index.html` 现在包含独立的 Python 学习专区 `.python-focus-section`，它不是单一卡片，而是一个带说明、CTA 和多入口卡片的独立模块。
+- Python 学习内容落在 `ai-ops-interview/content/python/` 下，依赖现有 `get_categories()` 自动进入 topic 分类体系，因此新增 Python 主题时优先往该目录补 Markdown。
+- Python 子主题目前已扩展到异步编程、typing/Pydantic、FastAPI 服务开发、AI 应用测试；若继续扩展首页专区，优先保持“AI 应用开发所需 Python 能力”这个边界，不要泛化成完整 Python 教程站。
+- Python 专区当前已扩展到 13 个主题，新增方向包括 HTTP 客户端、配置管理、LangChain/LangGraph 项目组织、数据处理与 chunking；后续若继续补充，优先围绕 AI 应用“交付链路”扩展，而不是通用语法堆叠。
+
+
+
 
 
 ## 🏗️ 项目架构
